@@ -10,6 +10,7 @@ import {
     setWasmReady, isWasmReady,
     subscribe
 } from './state'
+import { createAndUploadBackup, validateBackupSuccess } from './src/services/backup'
 
 // Constants
 const SATOSHIS_PER_BTC: number = 100_000_000;
@@ -82,6 +83,7 @@ interface POSConfig {
     c: string; // currency code (alpha3)
     g?: boolean; // show gear (optional, defaults to false)
     n?: boolean; // show note/description (optional, defaults to true)
+    m?: string; // merchant ID (optional, required for backup functionality)
 }
 
 function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean): string {
@@ -734,7 +736,56 @@ function initPosPage(config: POSConfig): void {
             // Track invoice creation (using bucket for privacy)
             trackEvent('Create Invoice', { amount: satoshiBucket(satoshis), currency: currencyAlpha3 });
 
-            // Navigate to receive page
+            // Upload backup BEFORE showing invoice (critical for swap recovery)
+            if (config.m) {
+                console.log('Uploading backup before showing invoice...');
+                submitButton.innerHTML = '<span class="button-loading"><span class="spinner"></span>Securing backup...</span>';
+
+                try {
+                    // Get the Boltz session mnemonic from localStorage
+                    const wollet = getWollet();
+                    if (!wollet) {
+                        throw new Error('Wallet not initialized');
+                    }
+
+                    const dwid = wollet.dwid();
+                    const mnemonicKey = `btcpos-mnemonic-${dwid}`;
+                    const storedMnemonic = localStorage.getItem(mnemonicKey);
+
+                    if (!storedMnemonic) {
+                        throw new Error('Boltz session mnemonic not found in localStorage');
+                    }
+
+                    // Upload the encrypted backup
+                    const backupResult = await createAndUploadBackup(config.m, {
+                        swapId: invoice.swapId(),
+                        mnemonic: storedMnemonic,
+                        amountSatoshis: satoshis,
+                        bolt11Invoice: invoice.bolt11Invoice().toString(),
+                        metadata: {
+                            fiatAmount: fiatAmount,
+                            currency: currencyAlpha3,
+                            description: description || undefined,
+                        },
+                    });
+
+                    // Validate backup was successful
+                    validateBackupSuccess(backupResult);
+                    console.log('✅ Backup uploaded and validated successfully');
+                } catch (backupError) {
+                    console.error('Failed to upload backup:', backupError);
+                    // Restore button state
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalText;
+                    // Show error to user - do NOT proceed to show invoice
+                    alert(`Failed to secure backup: ${backupError instanceof Error ? backupError.message : 'Unknown error'}\n\nInvoice will not be displayed to ensure swap recovery is possible.`);
+                    return; // Critical: Do not show invoice if backup fails
+                }
+            } else {
+                console.warn('⚠️ No merchant ID configured - backup upload skipped (swap recovery not possible!)');
+            }
+
+            // Navigate to receive page (only reached if backup succeeded or no merchant ID)
             initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3);
 
             // Reset amount for next payment

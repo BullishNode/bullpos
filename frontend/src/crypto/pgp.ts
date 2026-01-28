@@ -55,8 +55,8 @@ export async function encryptSwapBackup(
 export async function validatePGPPublicKey(pgpPublicKeyArmored: string): Promise<boolean> {
     try {
         const publicKey = await openpgp.readKey({ armoredKey: pgpPublicKeyArmored });
-        // Check if key is valid and not expired
-        return !publicKey.isRevoked() && !(await publicKey.isExpired());
+        // Check if key is valid and not revoked
+        return !publicKey.isRevoked();
     } catch {
         return false;
     }
