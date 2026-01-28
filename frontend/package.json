@@ -1,16 +1,14 @@
 {
+    "name": "bullpos-frontend",
+    "version": "0.1.0",
+    "description": "Browser payment page for BullPOS (fork of btcpos)",
     "type": "module",
     "scripts": {
+        "dev": "webpack-dev-server",
         "start": "webpack-dev-server",
         "build": "rm -rf ./dist && webpack --config webpack.config.cjs --mode=production",
         "lint": "eslint *.ts **/*.ts",
-        "lint:fix": "eslint *.ts **/*.ts --fix",
-        "test": "vitest",
-        "test:ui": "vitest --ui",
-        "test:run": "vitest run",
-        "test:coverage": "vitest run --coverage",
-        "sync": "rsync -avh dist/ root@unique:/var/www/btcpos.cash/",
-        "deploy": "npm run build && npm run sync"
+        "lint:fix": "eslint *.ts **/*.ts --fix"
     },
     "dependencies": {
         "lwk_wasm": "^0.13.1"
@@ -19,14 +17,11 @@
         "@eslint/js": "^9.36.0",
         "@typescript-eslint/eslint-plugin": "^8.44.0",
         "@typescript-eslint/parser": "^8.44.0",
-        "@vitest/ui": "^4.0.18",
         "copy-webpack-plugin": "^11.0.0",
         "eslint": "^9.36.0",
         "globals": "^16.4.0",
-        "jsdom": "^27.4.0",
         "ts-loader": "^9.5.4",
         "typescript": "^5.3.0",
-        "vitest": "^4.0.18",
         "webpack": "^5.88.1",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.1"

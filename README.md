@@ -17,10 +17,22 @@ BullPOS enables merchants to create encrypted payment links with rich content (i
 ```
 bullpos/
 ├── frontend/          # Browser payment page (fork of btcpos)
+│   ├── index.ts       # Main application logic
+│   ├── state.ts       # State management
+│   ├── index.html     # Payment page UI
+│   └── webpack.config.cjs  # Build configuration
 ├── backend/           # Express + SQLite API server
 ├── package.json       # Monorepo workspace config
 └── README.md
 ```
+
+### Frontend (btcpos fork)
+
+The frontend is a fork of [btcpos](https://github.com/unique-org/btcpos) that adds unique payment link functionality while preserving the existing Boltz swap integration. Key features from btcpos:
+- **lwk_wasm**: Liquid Wallet Kit for L-BTC transactions
+- **Webpack**: Production-ready bundling
+- **TypeScript**: Type-safe development
+- **Boltz integration**: Lightning-to-Liquid swaps
 
 ## Development
 
