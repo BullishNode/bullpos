@@ -1,0 +1,28 @@
+REPOSITORY MISMATCH - CANNOT COMPLETE
+
+Issue: #41
+Expected Repository: bullbitcoin-mobile (Flutter/Dart)
+Actual Repository: bullpos (TypeScript/Node.js)
+
+Issue #41 Context:
+- Add image attachment support to invoice builder
+- Requires Flutter/Dart code changes
+- Files: lib/features/merchant_payments/ui/widgets/image_attachment.dart
+- Dependencies: Issue #40
+
+Current Repository Context:
+- bullpos - Browser-based POS system
+- TypeScript/React frontend
+- No Flutter/Dart code present
+- No merchant_payments feature module
+
+Root Cause:
+The vibelord worker was directed to work on a bullbitcoin-mobile issue
+in the bullpos repository worktree. These are separate projects with
+completely different tech stacks.
+
+Required Action:
+- Route issue #41 to bullbitcoin-mobile repository
+- Or mark as routing error in conductor
+
+This is a ROUTING ERROR, not a code issue.
