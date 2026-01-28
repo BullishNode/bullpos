@@ -1077,6 +1077,21 @@ function initErrorPage(message: string): void {
 // =============================================================================
 
 function route(): void {
+    // Check if this is a payment link route (/p/{linkId})
+    const pathname = window.location.pathname;
+    const paymentLinkMatch = pathname.match(/^\/p\/([^/]+)$/);
+
+    if (paymentLinkMatch) {
+        // Import and initialize the payment link page
+        import('./src/pages/PaymentLinkPage').then((module) => {
+            module.initPaymentLinkPage();
+        }).catch((error) => {
+            console.error('Failed to load payment link page:', error);
+            initErrorPage('Failed to load payment link page. Please try again.');
+        });
+        return;
+    }
+
     // Check hash first (privacy-preserving), then query string (for PWA install)
     const hash = window.location.hash.slice(1); // Remove the '#'
     const query = window.location.search.slice(1); // Remove the '?'
@@ -1138,6 +1153,12 @@ async function init(): Promise<void> {
 
     // Handle hash changes (browser back/forward)
     window.addEventListener('hashchange', () => {
+        stopRateUpdates();
+        route();
+    });
+
+    // Handle path changes (browser back/forward for payment links)
+    window.addEventListener('popstate', () => {
         stopRateUpdates();
         route();
     });
