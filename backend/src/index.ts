@@ -11,6 +11,7 @@ import { config } from 'dotenv';
 import { db } from './db/index.js';
 import authRoutes from './routes/auth.routes.js';
 import merchantRoutes from './routes/merchants.routes.js';
+import linksRoutes from './routes/links.routes.js';
 
 // Load environment variables
 config();
@@ -40,15 +41,12 @@ app.get('/health', (_req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/merchants', merchantRoutes);
+app.use('/api/links', linksRoutes);
 
 // TODO: Add remaining routes
 // - GET /api/merchants/profile
 // - PUT /api/merchants/profile
 // - GET /api/merchants/:id/pgp
-// - POST /api/links
-// - GET /api/links/:id
-// - GET /api/links
-// - DELETE /api/links/:id
 // - POST /api/backups
 // - PUT /api/backups/:id
 // - GET /api/backups
