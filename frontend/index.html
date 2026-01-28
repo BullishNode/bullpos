@@ -198,6 +198,11 @@
         </div>
 
         <div class="receive-container">
+            <!-- Header image (if present) -->
+            <div id="header-image-section" class="header-image-section" style="display: none;">
+                <img id="header-image" alt="Invoice Header" class="invoice-header-image">
+            </div>
+
             <div class="amount-summary">
                 <div class="amount-row">
                     <span class="amount-label">Amount</span>
@@ -205,6 +210,22 @@
                 </div>
                 <div class="amount-row secondary">
                     <span class="amount-fiat" id="receive-fiat">≈ $0.00</span>
+                </div>
+            </div>
+
+            <!-- Line items (if present) -->
+            <div id="line-items-section" class="line-items-section" style="display: none;">
+                <h3>Items</h3>
+                <div id="line-items-list" class="line-items-list"></div>
+            </div>
+
+            <!-- PDF attachment (if present) -->
+            <div id="pdf-section" class="pdf-section" style="display: none;">
+                <div class="pdf-preview">
+                    <span class="pdf-icon">📄</span>
+                    <span id="pdf-filename" class="pdf-filename">document.pdf</span>
+                    <a id="pdf-download" download class="pdf-download-button">Download</a>
+                    <button type="button" id="pdf-view" class="pdf-view-button">View</button>
                 </div>
             </div>
 
@@ -224,6 +245,19 @@
             </div>
 
             <button type="button" id="back-to-pos" class="submit-button secondary-button">← New Payment</button>
+        </div>
+
+        <!-- PDF Viewer Modal (hidden by default) -->
+        <div id="pdf-viewer-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span id="modal-pdf-filename" class="modal-title">Document</span>
+                    <button type="button" id="close-pdf-modal" class="modal-close-button">×</button>
+                </div>
+                <div class="modal-body">
+                    <embed id="pdf-embed" type="application/pdf" class="pdf-embed">
+                </div>
+            </div>
         </div>
 
         <div class="wasm-status" id="wasm-status">
