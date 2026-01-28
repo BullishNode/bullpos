@@ -1,0 +1,33 @@
+## Summary
+
+I've successfully implemented issue #20 for the BullPOS swap claim and backup update functionality. Here's what was accomplished:
+
+### Implementation Details
+
+1. **Backup Update API** - Added `updateSwapBackup()` function to send PUT requests with writeToken authorization
+2. **Claim Service** - Created new service (`src/services/claim.ts`) to orchestrate backup updates after payment
+3. **State Management** - Extended state to track backup metadata (backupId, writeToken, merchantId, original data)
+4. **Claim Flow Integration** - Modified `spawnCompletePay()` to automatically update backup after successful claim
+5. **Error Handling** - Graceful degradation if backup update fails (doesn't disrupt user experience)
+
+### Key Features
+
+- ✅ Backup info stored when invoice is created
+- ✅ Preimage extraction attempted from lwk InvoiceResponse
+- ✅ Backup re-encrypted with claim details using merchant's PGP key
+- ✅ Backup status updated to 'claimed' on backend
+- ✅ Retry logic with exponential backoff for reliability
+- ✅ Transaction details logged for debugging
+- ✅ Build and lint pass successfully
+
+### Testing
+
+- ✅ TypeScript compilation successful
+- ✅ ESLint validation passed
+- ✅ Webpack build completed (with size warnings only)
+
+FIX_COMPLETE
+CONFIDENCE: 8
+PR_CREATED: 78
+
+MEMORY_STORE: type=feature_implementation summary="Implemented swap claim and backup update after Lightning payment - stores backup metadata, updates backup with preimage and claimed status via writeToken authorization" issue=#20 result=success

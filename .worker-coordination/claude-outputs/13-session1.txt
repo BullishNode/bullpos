@@ -1,0 +1,32 @@
+The uncommitted change is just the root-level `package-lock.json` which is not needed for the PR. The implementation is complete and the PR has been successfully created.
+
+## Summary
+
+I successfully implemented AES-256-GCM decryption for payment link payloads in the BullPOS frontend:
+
+### Files Created:
+1. **`frontend/src/crypto/aes.ts`** - AES-256-GCM encryption/decryption module with:
+   - `importAesKey()` - Imports 256-bit keys into WebCrypto
+   - `decryptAesGcm()` - Decrypts payloads with nonce handling
+   - `decryptJsonPayload()` - Decrypts and parses JSON payloads
+   - `encryptAesGcm()` - Encrypts plaintext
+   - `DecryptionError` class for error handling
+
+2. **`frontend/src/utils/encoding.ts`** - Base64url encoding/decoding utilities:
+   - `base64UrlEncode()` / `base64UrlDecode()` for strings
+   - `base64UrlDecodeToBuffer()` / `base64UrlEncodeBuffer()` for ArrayBuffers
+
+### Acceptance Criteria Met:
+- ✅ Key imported successfully from base64url
+- ✅ Decryption works with correct key
+- ✅ Invalid key returns clear error
+- ✅ Corrupted ciphertext returns clear error
+- ✅ Decrypted payload parsed as JSON
+- ✅ Build passes
+- ✅ Lint passes
+
+```
+FIX_COMPLETE
+CONFIDENCE: 10
+PR_CREATED: 71
+```

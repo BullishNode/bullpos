@@ -1,0 +1,29 @@
+Excellent! The PR has been created successfully. Let me provide the completion signal:
+
+---
+
+## Work Complete
+
+After thorough analysis of the btcpos codebase, I discovered that **all acceptance criteria for issue #17 are already fully implemented**. No new code was required.
+
+### Key Findings
+
+All requirements were met in the existing `frontend/index.ts`:
+
+1. ✅ **Reverse swap creation** (line 730): `getBoltzSession().invoice(BigInt(satoshis), description, claimAddress)`
+2. ✅ **Merchant's Liquid address** (lines 1114-1119): Derived from CT descriptor
+3. ✅ **Claim keys stored** (lines 322-347): 12-word mnemonic in localStorage
+4. ✅ **Lightning invoice with QR** (lines 969-1062): Full display with copy functionality
+5. ✅ **Accurate amounts**: Proper fiat ↔ sats conversion
+
+### Deliverables
+
+- Created comprehensive `BOLTZ_INTEGRATION.md` documentation
+- Verified build and lint pass successfully
+- Created PR #75 documenting the existing implementation
+
+---
+
+FIX_COMPLETE
+CONFIDENCE: 10
+PR_CREATED: 75

@@ -1,0 +1,50 @@
+## Summary
+
+I've successfully implemented issue #19: **Backup upload before showing invoice**. Here's what was accomplished:
+
+### Implementation Details
+
+**New Files Created:**
+1. `frontend/src/api/backups.ts` - Backup API client with retry logic using exponential backoff
+2. `frontend/src/services/backup.ts` - Backup service that orchestrates PGP encryption and upload
+
+**Modified Files:**
+1. `frontend/index.ts` - Integrated backup flow into invoice creation
+2. `frontend/src/crypto/pgp.ts` - Fixed OpenPGP.js API compatibility
+
+### Key Features
+
+**Critical Safety Flow:**
+- Invoice is created via Boltz
+- Swap backup is encrypted with merchant's PGP key  
+- Backup is uploaded to backend with 3 retry attempts
+- **Invoice is only displayed if backup succeeds**
+- Clear error message prevents invoice display on backup failure
+
+**Security:**
+- End-to-end PGP encryption (only merchant can decrypt)
+- Exponential backoff retry (1s, 2s, 4s delays)
+- Validation ensures backup was stored successfully
+- Prevents showing invoices for unrecoverable swaps
+
+### All Acceptance Criteria Met
+
+✅ Backup created with all swap details (swapId, mnemonic, invoice, amount, metadata)  
+✅ Backup encrypted with PGP  
+✅ Backup uploaded before invoice shown  
+✅ Upload failure prevents invoice display  
+✅ Retry logic for transient failures
+
+### Build Status
+
+✅ Frontend build successful  
+✅ ESLint validation passed  
+✅ TypeScript compilation successful
+
+---
+
+```
+FIX_COMPLETE
+CONFIDENCE: 9
+PR_CREATED: 77
+```

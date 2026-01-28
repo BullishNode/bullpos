@@ -8,6 +8,5 @@ declare var __webpack_public_path__: string;
 import("./index")
     .catch(e => console.error("Error importing `index`:", e));
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 __webpack_public_path__ = "/"
 

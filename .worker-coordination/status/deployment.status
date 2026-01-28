@@ -1,0 +1,6 @@
+worker=deployment
+instance=1
+status=stopping
+current_item=none
+updated_at=2026-01-27T23:23:15-06:00
+pid=3638843
