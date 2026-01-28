@@ -1,1 +1,54 @@
-{}
+{
+  "last_updated": "2026-01-28T02:53:00-06:00",
+  "flagged_areas": {
+    "backend_eslint_mismatch": {
+      "severity": "low",
+      "location": "backend/package.json",
+      "description": "Backend uses ESLint v8 dependencies but frontend uses ESLint v9 flat config. Inconsistent linting configuration across monorepo.",
+      "recommendation": "Upgrade backend ESLint to v9 and add eslint.config.js for consistency",
+      "related_issues": [],
+      "session_flagged": 4
+    },
+    "root_src_directory_cleanup": {
+      "severity": "low",
+      "location": "src/",
+      "description": "Root-level src/ directory exists but contains no TypeScript source files. Appears to be placeholder or legacy directory.",
+      "recommendation": "Verify if directory is needed. If not, remove to reduce codebase clutter.",
+      "related_issues": [],
+      "session_flagged": 4
+    },
+    "mysterious_n_directory": {
+      "severity": "low",
+      "location": "N/",
+      "description": "Directory containing only CLAUDE.md file exists at root, backend, and frontend levels. Likely development artifact from automated process.",
+      "recommendation": "Remove N/ directories from all locations and add to .gitignore",
+      "related_issues": [],
+      "session_flagged": 4
+    },
+    "aes_crypto_placeholder": {
+      "severity": "medium",
+      "location": "frontend/src/crypto/aes.ts",
+      "description": "AES encryption module has complete type signatures but throws 'Not implemented' errors. Tracked by issue #13.",
+      "recommendation": "Implement using WebCrypto API for AES-256-GCM encryption",
+      "related_issues": ["#13"],
+      "session_flagged": 3
+    },
+    "received_amount_fallback": {
+      "severity": "medium",
+      "location": "frontend/index.ts",
+      "description": "getReceivedAmount function returns fallback value pending LWK API maturity. Real received amount detection not yet implemented.",
+      "recommendation": "Implement when LWK provides reliable UTXO query API",
+      "related_issues": [],
+      "session_flagged": 4
+    },
+    "lib_features_tracking_obsolete": {
+      "severity": "info",
+      "location": ".worker-coordination/architecture/area-coverage.json",
+      "description": "Previous sessions tracked lib/features/ directory which no longer exists in codebase. Updated in session 4.",
+      "recommendation": "Already addressed - tracking moved to removed_areas section",
+      "related_issues": [],
+      "session_flagged": 4,
+      "resolved": true
+    }
+  }
+}
