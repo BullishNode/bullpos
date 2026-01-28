@@ -11,13 +11,14 @@ export const swapBackupStatusSchema = z.enum(['pending', 'claimed', 'failed', 'r
 // Create backup request (POST /api/backups)
 export const createBackupSchema = z.object({
   merchantId: z.string().min(1, 'Merchant ID is required'),
-  encryptedData: z.string().min(1, 'Encrypted data is required'),
+  encryptedData: z.string().min(1, 'Encrypted data is required').max(1048576, 'Encrypted data too large (max 1MB)'),
 });
 
 // Update backup request (PUT /api/backups/:id)
 export const updateBackupSchema = z.object({
+  writeToken: z.string().min(1, 'Write token is required'),
   status: swapBackupStatusSchema.optional(),
-  encryptedData: z.string().min(1).optional(),
+  encryptedData: z.string().min(1).max(1048576, 'Encrypted data too large (max 1MB)').optional(),
 }).refine(
   (data) => data.status !== undefined || data.encryptedData !== undefined,
   { message: 'At least one field (status or encryptedData) must be provided' }

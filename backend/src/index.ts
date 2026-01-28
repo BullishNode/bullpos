@@ -73,9 +73,37 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`BullPOS Backend running on port ${PORT}`);
   console.log(`Database: ${DB_PATH}`);
 });
+
+// Graceful shutdown handlers
+function shutdown(signal: string) {
+  console.log(`\n${signal} received, closing database and server...`);
+
+  // Close database connection
+  try {
+    db.close();
+    console.log('Database closed successfully');
+  } catch (error) {
+    console.error('Error closing database:', error);
+  }
+
+  // Close server
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
 
 export default app;

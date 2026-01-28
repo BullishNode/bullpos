@@ -41,6 +41,7 @@ export function initializeDatabase() {
       merchant_id TEXT NOT NULL,
       encrypted_data TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
+      write_token TEXT NOT NULL,
       created_at INTEGER NOT NULL DEFAULT (unixepoch()),
       updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
       FOREIGN KEY (merchant_id) REFERENCES merchants(id) ON DELETE CASCADE,
@@ -60,6 +61,7 @@ export interface SwapBackup {
   merchant_id: string;
   encrypted_data: string;
   status: SwapBackupStatus;
+  write_token: string;
   created_at: number;
   updated_at: number;
 }

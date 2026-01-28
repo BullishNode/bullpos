@@ -15,6 +15,29 @@ import { authenticateToken, type AuthRequest } from '../middleware/auth.middlewa
 import { backupRateLimiter, merchantRateLimiter } from '../middleware/rate-limit';
 import { validateBackupSize } from '../middleware/size-limit';
 import type Database from 'better-sqlite3';
+import { ZodError } from 'zod';
+
+/**
+ * Helper function to convert SwapBackup to JSON response
+ * Extracts duplicate response mapping logic
+ */
+function toBackupResponse(backup: {
+  id: string;
+  merchant_id: string;
+  encrypted_data?: string;
+  status: string;
+  created_at: number;
+  updated_at: number;
+}) {
+  return {
+    id: backup.id,
+    merchantId: backup.merchant_id,
+    encryptedData: backup.encrypted_data,
+    status: backup.status,
+    createdAt: backup.created_at,
+    updatedAt: backup.updated_at,
+  };
+}
 
 export function createBackupRoutes(db: Database.Database): Router {
   const router = Router();
@@ -24,6 +47,7 @@ export function createBackupRoutes(db: Database.Database): Router {
    * POST /api/backups
    * Create a new backup (public endpoint - browser uploads encrypted backup)
    * Includes aggressive rate limiting (50 per hour) and size validation (max 500 KB)
+   * Returns writeToken that must be included in subsequent PUT requests
    */
   router.post(
     '/',
@@ -40,13 +64,16 @@ export function createBackupRoutes(db: Database.Database): Router {
         res.status(201).json({
           id: backup.id,
           merchantId: backup.merchant_id,
+          writeToken: backup.writeToken, // Return write token for authorization on updates
           status: backup.status,
           createdAt: backup.created_at,
           updatedAt: backup.updated_at,
         });
       } catch (error) {
-        if (error instanceof Error && error.name === 'ZodError') {
+        if (error instanceof ZodError) {
           res.status(400).json({ error: 'Invalid request data', details: error.message });
+        } else if (error instanceof Error && error.message === 'Merchant not found') {
+          res.status(404).json({ error: 'Merchant not found' });
         } else {
           console.error('Error creating backup:', error);
           res.status(500).json({ error: 'Failed to create backup' });
@@ -58,7 +85,7 @@ export function createBackupRoutes(db: Database.Database): Router {
   /**
    * PUT /api/backups/:id
    * Update backup status and/or encrypted data (public endpoint - browser updates after claim)
-   * Includes rate limiting
+   * Requires writeToken for authorization (prevents unauthorized modifications)
    */
   router.put(
     '/:id',
@@ -68,26 +95,26 @@ export function createBackupRoutes(db: Database.Database): Router {
         const backupId = backupIdSchema.parse(req.params.id);
         const validatedData = updateBackupSchema.parse(req.body);
 
-        const updatedBackup = backupService.updateBackup(backupId, {
-          status: validatedData.status,
-          encryptedData: validatedData.encryptedData,
-        });
+        const updatedBackup = backupService.updateBackup(
+          backupId,
+          validatedData.writeToken,
+          {
+            status: validatedData.status,
+            encryptedData: validatedData.encryptedData,
+          }
+        );
 
         if (!updatedBackup) {
           res.status(404).json({ error: 'Backup not found' });
           return;
         }
 
-        res.json({
-          id: updatedBackup.id,
-          merchantId: updatedBackup.merchant_id,
-          status: updatedBackup.status,
-          createdAt: updatedBackup.created_at,
-          updatedAt: updatedBackup.updated_at,
-        });
+        res.json(toBackupResponse(updatedBackup));
       } catch (error) {
-        if (error instanceof Error && error.name === 'ZodError') {
+        if (error instanceof ZodError) {
           res.status(400).json({ error: 'Invalid request data', details: error.message });
+        } else if (error instanceof Error && error.message === 'Invalid write token') {
+          res.status(403).json({ error: 'Invalid write token' });
         } else {
           console.error('Error updating backup:', error);
           res.status(500).json({ error: 'Failed to update backup' });
@@ -115,14 +142,7 @@ export function createBackupRoutes(db: Database.Database): Router {
         const backups = backupService.listBackupsByMerchant(req.merchantId);
 
         res.json({
-          backups: backups.map((backup) => ({
-            id: backup.id,
-            merchantId: backup.merchant_id,
-            encryptedData: backup.encrypted_data,
-            status: backup.status,
-            createdAt: backup.created_at,
-            updatedAt: backup.updated_at,
-          })),
+          backups: backups.map(toBackupResponse),
         });
       } catch (error) {
         console.error('Error listing backups:', error);
@@ -161,16 +181,9 @@ export function createBackupRoutes(db: Database.Database): Router {
           return;
         }
 
-        res.json({
-          id: backup.id,
-          merchantId: backup.merchant_id,
-          encryptedData: backup.encrypted_data,
-          status: backup.status,
-          createdAt: backup.created_at,
-          updatedAt: backup.updated_at,
-        });
+        res.json(toBackupResponse(backup));
       } catch (error) {
-        if (error instanceof Error && error.name === 'ZodError') {
+        if (error instanceof ZodError) {
           res.status(400).json({ error: 'Invalid backup ID' });
         } else {
           console.error('Error getting backup:', error);

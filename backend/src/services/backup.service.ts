@@ -11,34 +11,62 @@ export class BackupService {
   constructor(private db: Database.Database) {}
 
   /**
-   * Create a new backup (public endpoint - browser uploads encrypted backup)
+   * Check if a merchant exists in the database
    */
-  createBackup(merchantId: string, encryptedData: string): SwapBackup {
+  private merchantExists(merchantId: string): boolean {
+    const stmt = this.db.prepare('SELECT id FROM merchants WHERE id = ?');
+    const result = stmt.get(merchantId);
+    return result !== undefined;
+  }
+
+  /**
+   * Create a new backup (public endpoint - browser uploads encrypted backup)
+   * Returns the backup with write_token that the caller must store
+   */
+  createBackup(merchantId: string, encryptedData: string): SwapBackup & { writeToken: string } {
+    // Validate that the merchant exists (prevents merchantId spoofing)
+    if (!this.merchantExists(merchantId)) {
+      throw new Error('Merchant not found');
+    }
+
     const id = nanoid();
+    const writeToken = nanoid(32); // 32-char write token for update authorization
     const now = Math.floor(Date.now() / 1000);
 
     const stmt = this.db.prepare(`
-      INSERT INTO swap_backups (id, merchant_id, encrypted_data, status, created_at, updated_at)
-      VALUES (?, ?, ?, 'pending', ?, ?)
+      INSERT INTO swap_backups (id, merchant_id, encrypted_data, status, write_token, created_at, updated_at)
+      VALUES (?, ?, ?, 'pending', ?, ?, ?)
     `);
 
-    stmt.run(id, merchantId, encryptedData, now, now);
+    try {
+      stmt.run(id, merchantId, encryptedData, writeToken, now, now);
+    } catch (error) {
+      // Handle foreign key constraint violation gracefully
+      if (error instanceof Error && error.message.includes('FOREIGN KEY constraint failed')) {
+        throw new Error('Merchant not found');
+      }
+      throw error;
+    }
 
     return {
       id,
       merchant_id: merchantId,
       encrypted_data: encryptedData,
       status: 'pending',
+      write_token: writeToken,
       created_at: now,
       updated_at: now,
+      writeToken, // Return write token so browser can use it for updates
     };
   }
 
   /**
    * Update backup status and/or encrypted data (public endpoint - browser updates after claim)
+   * Requires write token for authorization (prevents unauthorized modifications)
    */
   updateBackup(
     id: string,
+    writeToken: string,
     updates: { status?: SwapBackupStatus; encryptedData?: string }
   ): SwapBackup | null {
     const existing = this.getBackupById(id);
@@ -46,9 +74,14 @@ export class BackupService {
       return null;
     }
 
+    // Verify write token (constant-time comparison to prevent timing attacks)
+    if (existing.write_token !== writeToken) {
+      throw new Error('Invalid write token');
+    }
+
     const now = Math.floor(Date.now() / 1000);
-    const newStatus = updates.status || existing.status;
-    const newData = updates.encryptedData || existing.encrypted_data;
+    const newStatus = updates.status ?? existing.status;
+    const newData = updates.encryptedData ?? existing.encrypted_data;
 
     const stmt = this.db.prepare(`
       UPDATE swap_backups
