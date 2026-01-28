@@ -1,0 +1,30 @@
+import Database from 'better-sqlite3';
+import path from 'path';
+
+// Initialize database
+const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/bullpos.db');
+export const db: Database.Database = new Database(dbPath);
+
+// Enable WAL mode for better concurrency
+db.pragma('journal_mode = WAL');
+
+// Create merchants table
+export function initializeDatabase() {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS merchants (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      store_name TEXT,
+      website_url TEXT,
+      description TEXT,
+      language TEXT DEFAULT 'en',
+      currency TEXT DEFAULT 'BTC',
+      pgp_public_key TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_merchants_email ON merchants(email);
+  `);
+}

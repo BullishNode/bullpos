@@ -7,9 +7,14 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { initializeDatabase } from './db/schema';
+import { merchantsRouter } from './routes/merchants.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize database
+initializeDatabase();
 
 // Security middleware
 app.use(helmet());
@@ -28,12 +33,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// TODO: Add routes
+// API Routes
+app.use('/api/merchants', merchantsRouter);
+
+// TODO: Add remaining routes
 // - POST /api/auth/login
 // - POST /api/merchants/register
-// - GET /api/merchants/profile
-// - PUT /api/merchants/profile
-// - GET /api/merchants/:id/pgp
 // - POST /api/links
 // - GET /api/links/:id
 // - GET /api/links
