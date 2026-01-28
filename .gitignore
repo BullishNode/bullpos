@@ -35,6 +35,7 @@ coverage/
 *.db
 *.sqlite
 *.sqlite3
+backend/data/
 
 # CLAUDE.md files - gitignored, never sync
 CLAUDE.md
