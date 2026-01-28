@@ -22,6 +22,11 @@ try {
   process.exit(1);
 }
 
+// Trust proxy configuration (required when running behind reverse proxies like nginx, AWS ALB, Cloudflare)
+// This allows Express to correctly read client IP from X-Forwarded-For headers
+// Required for accurate rate limiting and logging
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 app.use(cors());
