@@ -10,6 +10,8 @@ import {
     setWasmReady, isWasmReady,
     subscribe
 } from './state'
+import { RateLockTimer } from './src/components/RateLockTimer'
+import { refreshRateAndSwap, cancelOldSwap } from './src/services/rate-refresh'
 
 // Constants
 const SATOSHIS_PER_BTC: number = 100_000_000;
@@ -82,6 +84,7 @@ interface POSConfig {
     c: string; // currency code (alpha3)
     g?: boolean; // show gear (optional, defaults to false)
     n?: boolean; // show note/description (optional, defaults to true)
+    r?: number; // rateLockMins - rate lock duration in minutes (optional, defaults to 15)
 }
 
 function encodeConfig(descriptor: string, currency: string, showGear: boolean, showDescription: boolean): string {
@@ -111,6 +114,10 @@ function decodeConfig(encoded: string): POSConfig | null {
         // Default showDescription to true if not present
         if (typeof config.n !== 'boolean') {
             config.n = true;
+        }
+        // Default rateLockMins to 15 if not present or invalid
+        if (typeof config.r !== 'number' || config.r <= 0) {
+            config.r = 15;
         }
         return config;
     } catch {
@@ -734,8 +741,9 @@ function initPosPage(config: POSConfig): void {
             // Track invoice creation (using bucket for privacy)
             trackEvent('Create Invoice', { amount: satoshiBucket(satoshis), currency: currencyAlpha3 });
 
-            // Navigate to receive page
-            initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3);
+            // Navigate to receive page (with rate lock if configured and fiat amount > 0)
+            const rateLockMins = (fiatAmount > 0 && currentPosConfig) ? currentPosConfig.r : undefined;
+            initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3, rateLockMins, description);
 
             // Reset amount for next payment
             currentAmount = '0';
@@ -966,7 +974,14 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
 // Store the current config for returning to POS
 let currentPosConfig: POSConfig | null = null;
 
-function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmount: number, currencyAlpha3: string): void {
+function initReceivePage(
+    invoice: lwk.InvoiceResponse,
+    satoshis: number,
+    fiatAmount: number,
+    currencyAlpha3: string,
+    rateLockMins?: number,
+    description?: string
+): void {
     renderTemplate('receive-page-template');
 
     // Get DOM elements
@@ -1030,9 +1045,80 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
         }
     });
 
+    // Rate lock timer for fiat-amount invoices
+    let rateLockTimer: RateLockTimer | null = null;
+    if (rateLockMins && rateLockMins > 0 && fiatAmount > 0) {
+        const timerContainer = document.getElementById('rate-lock-timer-container') as HTMLDivElement;
+        const timerValue = document.getElementById('rate-lock-timer-value') as HTMLDivElement;
+
+        if (timerContainer && timerValue) {
+            timerContainer.style.display = 'block';
+
+            rateLockTimer = new RateLockTimer({
+                durationMins: rateLockMins,
+                onExpiry: async () => {
+                    console.log('Rate lock expired, refreshing...');
+                    statusText.textContent = 'Refreshing rate...';
+
+                    try {
+                        const receiveContainer = document.querySelector('.receive-container') as HTMLDivElement;
+                        if (receiveContainer) {
+                            receiveContainer.classList.add('refreshing');
+                        }
+
+                        // Cancel old swap
+                        await cancelOldSwap(invoice);
+
+                        // Get claim address
+                        const claimAddress = await getClaimAddress();
+
+                        // Refresh rate and create new swap
+                        const result = await refreshRateAndSwap(
+                            fiatAmount,
+                            currencyAlpha3,
+                            description || '',
+                            claimAddress
+                        );
+
+                        // Update invoice state
+                        setInvoiceResponse(result.invoice);
+
+                        // Reinitialize receive page with new invoice
+                        initReceivePage(
+                            result.invoice,
+                            result.satoshis,
+                            result.fiatAmount,
+                            currencyAlpha3,
+                            rateLockMins,
+                            description
+                        );
+                    } catch (error) {
+                        console.error('Failed to refresh rate:', error);
+                        statusIndicator.classList.remove('loading');
+                        statusIndicator.classList.add('error');
+                        statusText.textContent = 'Failed to refresh rate';
+                    }
+                },
+                onTick: (remainingMs) => {
+                    const totalSeconds = Math.ceil(remainingMs / 1000);
+                    const minutes = Math.floor(totalSeconds / 60);
+                    const seconds = totalSeconds % 60;
+                    timerValue.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            });
+
+            rateLockTimer.start();
+        }
+    }
+
     // Spawn background task to wait for payment completion
     spawnCompletePay(invoice, (success: boolean) => {
         if (success) {
+            // Stop rate lock timer if running
+            if (rateLockTimer) {
+                rateLockTimer.stop();
+            }
+
             // Payment completed successfully
             statusIndicator.classList.remove('loading');
             statusIndicator.classList.add('ready');
