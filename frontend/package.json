@@ -6,7 +6,6 @@
     "scripts": {
         "dev": "webpack-dev-server",
         "start": "webpack-dev-server",
-        "dev": "webpack-dev-server",
         "build": "rm -rf ./dist && webpack --config webpack.config.cjs --mode=production",
         "lint": "eslint *.ts **/*.ts",
         "lint:fix": "eslint *.ts **/*.ts --fix"
