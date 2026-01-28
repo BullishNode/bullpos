@@ -1228,3 +1228,44 @@ body {
         font-size: 12px;
     }
 }
+
+/* Rate Lock Timer */
+.rate-lock-timer-container {
+    margin: 16px 0;
+    text-align: center;
+}
+
+.rate-lock-timer {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timer-label {
+    font-size: 12px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timer-value {
+    font-size: 24px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #f7931a;
+}
+
+.rate-lock-timer.refreshing .timer-value {
+    opacity: 0.5;
+}
+
+/* Refreshing state */
+.receive-container.refreshing {
+    pointer-events: none;
+    opacity: 0.6;
+}
