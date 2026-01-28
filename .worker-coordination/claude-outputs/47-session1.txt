@@ -1,0 +1,86 @@
+# Issue #47 - Session 1 Output
+
+## Issue Details
+- **Title:** [bullbitcoin-mobile] Implement payment detail screen
+- **Status:** OPEN
+- **Repository:** Should be bullbitcoin-mobile, routed to bullpos
+- **Error Type:** ROUTING_ERROR_MOBILE
+
+## Investigation Summary
+
+### Routing Error Confirmed
+Issue #47 is a clear routing error. The issue:
+1. Explicitly declares "Repository: bullbitcoin-mobile" in the issue body
+2. Has "[bullbitcoin-mobile]" prefix in the title
+3. Lists only Flutter/Dart files as targets:
+   - lib/features/merchant_payments/ui/payment_detail_screen.dart
+   - lib/features/merchant_payments/ui/widgets/payment_info_card.dart
+   - lib/features/merchant_payments/ui/widgets/transaction_info.dart
+
+### Codebase Reality
+bullpos repository contains:
+- backend/ (Node.js Lightning Network)
+- frontend/ (TypeScript web POS interface)
+- src/ (Shared utilities)
+
+bullpos has ZERO Flutter/Dart code and no lib/features/ directory structure.
+
+### Technology Stack Mismatch
+- **Required:** Flutter widgets, BuildContext, Scaffold, Dart
+- **Available in bullpos:** HTML, CSS, TypeScript, Node.js
+
+Compatibility: 0%
+
+### Root Cause Analysis
+The conductor system extracts repository name from worktree path:
+```
+/tmp/vibelord-worktrees/bullpos/overnight/issue-47
+                        ^^^^^^^
+```
+
+Instead of parsing the bracketed prefix from issue title:
+```
+[bullbitcoin-mobile] Implement payment detail screen
+```
+
+### Pattern Recognition
+This is the third documented instance of this routing error pattern:
+- Issue #42: [bullbitcoin-mobile] → bullpos (PR #98)
+- Issue #44: Multi-repo coordination failure (PR #101)
+- Issue #47: [bullbitcoin-mobile] → bullpos (THIS ISSUE)
+
+## Actions Taken
+
+### 1. Documentation Created
+Created `.github/issues/ROUTING_ERROR_47.md` with:
+- Complete diagnostic information
+- Codebase reality check
+- Root cause analysis
+- Recommended remediation steps
+- Links to related routing errors
+
+### 2. PR Creation (Next Step)
+Will create PR with documentation to:
+- Track this routing error
+- Provide diagnostic info for maintainers
+- Satisfy completion signal requirements
+
+## Recommendations
+
+1. **Close issue #47 in bullpos** - Cannot be implemented here
+2. **Verify bullbitcoin-mobile repo exists** - May need to create it
+3. **Re-route to correct repository** - If it exists
+4. **Fix conductor.sh routing logic** - Parse [repo-name] prefix from titles
+5. **Audit entire batch** - Check all 56 issues in batch-20260127-181138-2751594
+
+## Dependencies
+Issue #47 depends on issue #46, which is likely also a routing error (part of same batch, sequence 46).
+
+## Completion Status
+- [x] Routing error identified and confirmed
+- [x] Documentation file created
+- [ ] PR created (next step)
+- [ ] Completion signal output
+
+---
+Session completed: 2026-01-28 03:05 AM CST
