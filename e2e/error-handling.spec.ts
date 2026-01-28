@@ -10,7 +10,7 @@ test.describe('Invalid Payment Links', () => {
     await page.goto('/#invalid-base64-string!!!');
 
     // Wait for page to load and process the invalid link
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
 
     // Should show error page
     await expect(page.locator('.error-container')).toBeVisible();
@@ -23,7 +23,7 @@ test.describe('Invalid Payment Links', () => {
     const encoded = invalidJson.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -35,7 +35,7 @@ test.describe('Invalid Payment Links', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -47,7 +47,7 @@ test.describe('Invalid Payment Links', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -59,26 +59,26 @@ test.describe('Invalid Payment Links', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should provide recovery option on error page', async ({ page }) => {
     await page.goto('/#invalid');
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
 
     // Should have a button to go back to setup
-    const setupButton = page.locator('button:has-text("Go to Setup"), a:has-text("Go to Setup")');
+    const setupButton = page.locator('a.error-button:has-text("Go to Setup")');
     await expect(setupButton).toBeVisible();
 
     // Click should navigate to setup page
     await setupButton.click();
-    await page.waitForURL(/setup/, { timeout: 5000 });
+    await page.waitForSelector('#setup-form', { timeout: 5000 });
 
     // Should now be on setup page
-    await expect(page.locator('.setup-page, #setup-form')).toBeVisible();
+    await expect(page.locator('#setup-form')).toBeVisible();
   });
 });
 
@@ -94,7 +94,7 @@ test.describe('Security - XSS Prevention', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
 
     // Should not trigger script execution - page should either error or safely display
     const dialogPromise = page.waitForEvent('dialog', { timeout: 1000 }).catch(() => null);
@@ -115,7 +115,7 @@ test.describe('Security - XSS Prevention', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
 
     const dialogPromise = page.waitForEvent('dialog', { timeout: 1000 }).catch(() => null);
     const dialog = await dialogPromise;
@@ -130,7 +130,7 @@ test.describe('Security - XSS Prevention', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
 
     // Check that no alert is triggered
     const dialogPromise = page.waitForEvent('dialog', { timeout: 1000 }).catch(() => null);
@@ -155,7 +155,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     // Should show error page instead of crashing
     await expect(page.locator('.error-container')).toBeVisible();
   });
@@ -168,7 +168,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -183,7 +183,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -198,7 +198,12 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    // Wait for either error page or POS page to render
+    await Promise.race([
+      page.waitForSelector('.error-container', { timeout: 10000 }),
+      page.waitForSelector('#amount', { timeout: 10000 })
+    ]);
+
     // May show error or handle gracefully depending on validation
     const isError = await page.locator('.error-container').isVisible();
     const isPOS = await page.locator('#amount').isVisible();
@@ -219,7 +224,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     // Should handle without crashing
     const pageLoaded = await page.locator('body').isVisible();
     expect(pageLoaded).toBeTruthy();
@@ -236,7 +241,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 
@@ -251,7 +256,7 @@ test.describe('Edge Cases', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     await expect(page.locator('.error-container')).toBeVisible();
   });
 });
@@ -271,7 +276,7 @@ test.describe('Network Conditions', () => {
 
     await page.goto(`/#${encoded}`);
 
-    // Page should still load (static assets may be cached)
+    // Page should still load the static HTML (with Bitcoin symbol)
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
     // Go back online
@@ -291,7 +296,7 @@ test.describe('Invalid Descriptor Formats', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     // Should show error or handle gracefully
     const pageLoaded = await page.locator('body').isVisible();
     expect(pageLoaded).toBeTruthy();
@@ -308,7 +313,7 @@ test.describe('Invalid Descriptor Formats', () => {
 
     await page.goto(`/#${encoded}`);
 
-    await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+    await page.waitForSelector('.error-container', { timeout: 10000 });
     // App may accept any currency code or show error
     const pageLoaded = await page.locator('body').isVisible();
     expect(pageLoaded).toBeTruthy();
