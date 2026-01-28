@@ -44,6 +44,9 @@ export async function uploadSwapBackup(
         version: backup.version,
     };
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -52,7 +55,10 @@ export async function uploadSwapBackup(
                 'Accept': 'application/json',
             },
             body: JSON.stringify(payload),
+            signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => response.statusText);
@@ -70,7 +76,11 @@ export async function uploadSwapBackup(
             timestamp: data.createdAt,
         };
     } catch (error) {
+        clearTimeout(timeoutId);
         if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Upload timed out after 30 seconds');
+            }
             throw new Error(`Failed to upload swap backup: ${error.message}`);
         }
         throw new Error('Failed to upload swap backup: Unknown error');
@@ -103,6 +113,9 @@ export async function updateSwapBackup(
         payload.encryptedData = encryptedData;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     try {
         const response = await fetch(url, {
             method: 'PUT',
@@ -111,7 +124,10 @@ export async function updateSwapBackup(
                 'Accept': 'application/json',
             },
             body: JSON.stringify(payload),
+            signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => response.statusText);
@@ -120,7 +136,11 @@ export async function updateSwapBackup(
 
         return { success: true };
     } catch (error) {
+        clearTimeout(timeoutId);
         if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                throw new Error('Update timed out after 30 seconds');
+            }
             throw new Error(`Failed to update swap backup: ${error.message}`);
         }
         throw new Error('Failed to update swap backup: Unknown error');

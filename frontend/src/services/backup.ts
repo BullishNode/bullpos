@@ -3,7 +3,7 @@
  */
 
 import { SwapBackupData, EncryptedSwapBackup } from '../types/backup';
-import { encryptSwapBackup } from '../crypto/pgp';
+import { encryptSwapBackup, validatePGPPublicKey } from '../crypto/pgp';
 import { fetchMerchantPGPKey } from '../api/merchants';
 import { uploadSwapBackup, retryWithBackoff, BackupUploadResponse } from '../api/backups';
 
@@ -63,6 +63,12 @@ export async function createAndUploadBackup(
         throw new Error(
             `Failed to fetch merchant PGP key: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
+    }
+
+    // Step 2.5: Validate PGP public key
+    const isValidKey = await validatePGPPublicKey(pgpPublicKey);
+    if (!isValidKey) {
+        throw new Error('Merchant PGP public key is invalid or revoked');
     }
 
     // Step 3: Encrypt backup data with PGP

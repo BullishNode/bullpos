@@ -1142,6 +1142,8 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
     backToPosButton.addEventListener('click', () => {
         // Clear the invoice
         setInvoiceResponse(null);
+        // Clear backup state to prevent stale data in next transaction
+        setCurrentBackup(null);
         // Return to POS page
         if (currentPosConfig) {
             initPosPage(currentPosConfig);

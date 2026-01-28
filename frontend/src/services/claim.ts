@@ -3,7 +3,7 @@
  */
 
 import { SwapBackupData } from '../types/backup';
-import { encryptSwapBackup } from '../crypto/pgp';
+import { encryptSwapBackup, validatePGPPublicKey } from '../crypto/pgp';
 import { fetchMerchantPGPKey } from '../api/merchants';
 import { updateSwapBackup, retryWithBackoff } from '../api/backups';
 
@@ -40,6 +40,12 @@ export async function updateBackupAfterClaim(
     try {
         // Step 1: Fetch merchant's PGP public key
         const pgpPublicKey = await fetchMerchantPGPKey(merchantId);
+
+        // Step 1.5: Validate PGP public key
+        const isValidKey = await validatePGPPublicKey(pgpPublicKey);
+        if (!isValidKey) {
+            throw new Error('Merchant PGP public key is invalid or revoked');
+        }
 
         // Step 2: Create updated backup data with claim details
         const updatedBackupData: SwapBackupData = {

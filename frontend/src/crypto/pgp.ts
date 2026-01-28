@@ -56,7 +56,7 @@ export async function validatePGPPublicKey(pgpPublicKeyArmored: string): Promise
     try {
         const publicKey = await openpgp.readKey({ armoredKey: pgpPublicKeyArmored });
         // Check if key is valid and not revoked
-        return !publicKey.isRevoked();
+        return !(await publicKey.isRevoked());
     } catch {
         return false;
     }
