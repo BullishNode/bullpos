@@ -58,15 +58,17 @@ app.use('/api', authRouter); // Includes /api/merchants/register and /api/auth/l
 app.use('/api/links', linksRouter);
 app.use('/api/backups', backupsRouter);
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
 // Global error handler (must be after all routes)
 app.use(errorLogger);
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
-
-// Note: Route handlers are stubs (501 responses) pending full implementation in issue #7
-// Rate limiting and size validation middleware are now in place and ready to use
 
 app.listen(PORT, () => {
   console.log(`BullPOS Backend running on port ${PORT}`);
