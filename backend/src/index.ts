@@ -65,9 +65,6 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Note: Route handlers are stubs (501 responses) pending full implementation in issue #7
-// Rate limiting and size validation middleware are now in place and ready to use
-
 app.listen(PORT, () => {
   console.log(`BullPOS Backend running on port ${PORT}`);
 });
