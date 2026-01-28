@@ -31,7 +31,7 @@ test.describe('Payment Link Loading', () => {
     await expect(page.locator('h1')).toContainText('Bitcoin POS');
 
     // Check main elements are visible
-    await expect(page.locator('#amount-display')).toBeVisible();
+    await expect(page.locator('#amount')).toBeVisible();
     await expect(page.locator('#currency-code')).toContainText('USD');
 
     // Check keypad is visible
@@ -70,7 +70,7 @@ test.describe('Payment Link Loading', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.setup-gear')).toBeVisible();
+    await expect(page.locator('#setup-link')).toBeVisible();
   });
 
   test('should hide setup gear icon when disabled', async ({ page }) => {
@@ -78,7 +78,7 @@ test.describe('Payment Link Loading', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.setup-gear')).not.toBeVisible();
+    await expect(page.locator('#setup-link')).not.toBeVisible();
   });
 });
 
@@ -97,7 +97,7 @@ test.describe('Amount Entry', () => {
     await page.click('button:has-text("0")');
 
     // Check display
-    await expect(page.locator('#amount-display')).toContainText('12.50');
+    await expect(page.locator('#amount')).toContainText('12.50');
   });
 
   test('should clear amount', async ({ page }) => {
@@ -109,11 +109,11 @@ test.describe('Amount Entry', () => {
     // Enter amount
     await page.click('button:has-text("1")');
     await page.click('button:has-text("2")');
-    await expect(page.locator('#amount-display')).toContainText('12');
+    await expect(page.locator('#amount')).toContainText('12');
 
     // Clear
-    await page.click('button:has-text("C")');
-    await expect(page.locator('#amount-display')).toContainText('0');
+    await page.click('#clear');
+    await expect(page.locator('#amount')).toContainText('0');
   });
 
   test('should backspace digits', async ({ page }) => {
@@ -126,11 +126,11 @@ test.describe('Amount Entry', () => {
     await page.click('button:has-text("1")');
     await page.click('button:has-text("2")');
     await page.click('button:has-text("3")');
-    await expect(page.locator('#amount-display')).toContainText('123');
+    await expect(page.locator('#amount')).toContainText('123');
 
     // Backspace
     await page.click('button:has-text("⌫")');
-    await expect(page.locator('#amount-display')).toContainText('12');
+    await expect(page.locator('#amount')).toContainText('12');
   });
 });
 
@@ -142,17 +142,17 @@ test.describe('Currency Mode Switching', () => {
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
     // Should start in fiat mode
-    await expect(page.locator('#fiat-mode')).toHaveClass(/active/);
+    await expect(page.locator('#mode-fiat')).toHaveClass(/active/);
 
     // Switch to sats mode
-    await page.click('#sats-mode');
-    await expect(page.locator('#sats-mode')).toHaveClass(/active/);
-    await expect(page.locator('#fiat-mode')).not.toHaveClass(/active/);
+    await page.click('#mode-sats');
+    await expect(page.locator('#mode-sats')).toHaveClass(/active/);
+    await expect(page.locator('#mode-fiat')).not.toHaveClass(/active/);
 
     // Switch back to fiat mode
-    await page.click('#fiat-mode');
-    await expect(page.locator('#fiat-mode')).toHaveClass(/active/);
-    await expect(page.locator('#sats-mode')).not.toHaveClass(/active/);
+    await page.click('#mode-fiat');
+    await expect(page.locator('#mode-fiat')).toHaveClass(/active/);
+    await expect(page.locator('#mode-sats')).not.toHaveClass(/active/);
   });
 
   test('should display rate information', async ({ page }) => {
@@ -162,10 +162,10 @@ test.describe('Currency Mode Switching', () => {
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
     // Wait for rate to load (may take a moment)
-    await page.waitForSelector('#exchange-rate', { timeout: 15000 });
+    await page.waitForSelector('#rate-display', { timeout: 15000 });
 
     // Check rate display exists and has content
-    const rateText = await page.locator('#exchange-rate').textContent();
+    const rateText = await page.locator('#rate-display').textContent();
     expect(rateText).toBeTruthy();
   });
 });
@@ -177,7 +177,7 @@ test.describe('Submit Button', () => {
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
-    await expect(page.locator('#create-invoice-btn')).toBeDisabled();
+    await expect(page.locator('#submit')).toBeDisabled();
   });
 
   test('should enable submit button when amount is entered', async ({ page }) => {
@@ -190,7 +190,7 @@ test.describe('Submit Button', () => {
     await page.click('button:has-text("1")');
     await page.click('button:has-text("0")');
 
-    await expect(page.locator('#create-invoice-btn')).toBeEnabled();
+    await expect(page.locator('#submit')).toBeEnabled();
   });
 });
 
@@ -206,7 +206,7 @@ test.describe('Responsive Design', () => {
     // Check main elements are visible on mobile
     await expect(page.locator('.bitcoin-symbol')).toBeVisible();
     await expect(page.locator('.keypad')).toBeVisible();
-    await expect(page.locator('#amount-display')).toBeVisible();
+    await expect(page.locator('#amount')).toBeVisible();
   });
 
   test('should work on tablet viewport', async ({ page }) => {

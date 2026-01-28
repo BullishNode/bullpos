@@ -13,8 +13,8 @@ test.describe('Invalid Payment Links', () => {
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
     // Should show error page
-    await expect(page.locator('.error-page')).toBeVisible();
-    await expect(page.locator('.error-message')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
+    await expect(page.locator('#error-message')).toBeVisible();
   });
 
   test('should show error page for malformed JSON', async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe('Invalid Payment Links', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should show error page for missing descriptor field', async ({ page }) => {
@@ -36,7 +36,7 @@ test.describe('Invalid Payment Links', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should show error page for missing currency field', async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe('Invalid Payment Links', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should show error page for empty config', async ({ page }) => {
@@ -60,14 +60,14 @@ test.describe('Invalid Payment Links', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should provide recovery option on error page', async ({ page }) => {
     await page.goto('/#invalid');
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
 
     // Should have a button to go back to setup
     const setupButton = page.locator('button:has-text("Go to Setup"), a:has-text("Go to Setup")');
@@ -75,7 +75,7 @@ test.describe('Invalid Payment Links', () => {
 
     // Click should navigate to setup page
     await setupButton.click();
-    await page.waitForTimeout(500); // Wait for navigation
+    await page.waitForURL(/setup/, { timeout: 5000 });
 
     // Should now be on setup page
     await expect(page.locator('.setup-page, #setup-form')).toBeVisible();
@@ -139,7 +139,7 @@ test.describe('Security - XSS Prevention', () => {
     expect(dialog).toBeNull();
 
     // Error message should be present but sanitized
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 });
 
@@ -157,7 +157,7 @@ test.describe('Edge Cases', () => {
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
     // Should show error page instead of crashing
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should handle array instead of object', async ({ page }) => {
@@ -169,7 +169,7 @@ test.describe('Edge Cases', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should handle number instead of string for descriptor', async ({ page }) => {
@@ -184,7 +184,7 @@ test.describe('Edge Cases', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should handle unicode characters in config', async ({ page }) => {
@@ -200,8 +200,8 @@ test.describe('Edge Cases', () => {
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
     // May show error or handle gracefully depending on validation
-    const isError = await page.locator('.error-page').isVisible();
-    const isPOS = await page.locator('#amount-display').isVisible();
+    const isError = await page.locator('.error-container').isVisible();
+    const isPOS = await page.locator('#amount').isVisible();
 
     // Either error or POS page is acceptable
     expect(isError || isPOS).toBeTruthy();
@@ -237,7 +237,7 @@ test.describe('Edge Cases', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 
   test('should handle truncated base64', async ({ page }) => {
@@ -252,7 +252,7 @@ test.describe('Edge Cases', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
-    await expect(page.locator('.error-page')).toBeVisible();
+    await expect(page.locator('.error-container')).toBeVisible();
   });
 });
 
