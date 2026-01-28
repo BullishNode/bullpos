@@ -1,0 +1,49 @@
+# Issue #50 - Session 1 Continuation
+# Routing Error Detection and Documentation
+
+## Detection Summary
+- **Time**: 2026-01-28 03:09 AM CST
+- **Issue**: #50 "Verify Phase 5 Payment History and Recovery complete"
+- **Repository Context**: bullbitcoin-mobile (required) vs bullpos (actual)
+- **Conclusion**: ROUTING ERROR - Cannot proceed
+
+## Issue Analysis
+Issue #50 explicitly states "Repositories: bullbitcoin-mobile" in the context section.
+The issue requires:
+- Testing payment history functionality in mobile app
+- Verifying detail view displays correctly
+- Testing recovery with intentionally failed swaps
+- Running mobile integration tests
+
+All of these are Flutter/Dart mobile application features that do not exist in the bullpos TypeScript/Node.js web repository.
+
+## Tech Stack Incompatibility
+- Required: Flutter/Dart mobile app (bullbitcoin-mobile)
+- Available: TypeScript/Node.js web app (bullpos)
+- Compatibility: 0%
+
+## Batch Context
+Issue #50 is part of batch-20260127-181138-2751594 (sequence 50 of 56).
+This entire batch has systematic routing errors affecting mobile-tagged issues:
+- Issues #42, #44, #45, #46, #47, #48 all documented as routing errors
+- All require bullbitcoin-mobile but landed in bullpos
+- PRs #98, #101-105 document this pattern
+
+## Action Taken
+Following established pattern from issues #42-48:
+1. Created ROUTING_ERROR_50.md documentation file
+2. Created this session log for diagnostic tracking
+3. Will create PR with DO NOT MERGE recommendation
+4. PR satisfies vibelord FIX_COMPLETE signal requirement
+
+## Root Cause (Systemic)
+Conductor routing logic extracts repository from worktree filesystem path:
+  /tmp/vibelord-worktrees/bullpos/overnight/issue-50 → "bullpos"
+
+Should instead parse from issue metadata:
+  Issue body: "Repositories: bullbitcoin-mobile"
+
+## Recommendation
+Close issue #50 in bullpos repository.
+Re-assign to bullbitcoin-mobile repository with correct worktree context.
+Fix conductor.sh to parse repository from issue metadata, not filesystem paths.
