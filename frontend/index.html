@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Bitcoin Point of Sale - Receive Lightning payments directly to your wallet with low fees. Easy setup, shareable links for staff, no middleman.">
+    <title>Bitcoin POS</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='72' font-size='72' font-weight='bold' fill='%23f7931a' text-anchor='middle'>₿</text></svg>">
+    <link rel="manifest" id="manifest-link">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+</head>
+
+<body>
+    <!-- Main app container -->
+    <main id="app" class="container">
+        <!-- Initial loading state shown before JS loads -->
+        <div class="header">
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Bitcoin POS</h1>
+        </div>
+        <div class="loading-initial">
+            <p>Loading...</p>
+        </div>
+    </main>
+
+    <!-- Setup Page Template -->
+    <template id="setup-page-template">
+        <div class="header">
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Bitcoin POS</h1>
+            <p class="subtitle">Configure your Point of Sale</p>
+        </div>
+
+        <ul class="features-list">
+            <li>⚡ Receive Bitcoin Lightning payments directly to your wallet</li>
+            <li>🔗 Share the generated link with your staff — <a
+                    href="#eyJkIjoiY3Qoc2xpcDc3KDMyNjQxMmZmNGRmYzExMjNjNDRkM2NkNTJmMWU3MDNlNTM5NDlhNTUxNzI1MmM2MDdhNTU2MWUyMWUzOWQ5Y2MpLGVsd3BraCh4cHViNkQxTVBxZFJ3WVRocW14WFpnVGE0TWt1QkM2aTdKOGgzeUd2VkVmcnA2eENmQmhrQThKYmhVam9Na2V3QVc4NG51MWsxa1R1OVN3cWZocHFQdXFxa0cxNTVtQng2ejR0Q1BQTHF5MnZaRXMvPDA7MT4vKikpI2Y3NThkeGFrIiwiYyI6IlVTRCIsImciOnRydWV9"
+                    class="hint-link">see example</a></li>
+            <li>💰 Low fees: 0.25% + 50 sats per invoice — <a href="faq/#fees" class="hint-link">why?</a></li>
+            <li>📚 For other info, see the <a href="faq/" class="hint-link">faq</a></li>
+            <li>📖 Easy setup — <a href="docs/" class="hint-link">follow our tutorials →</a></li>
+        </ul>
+
+        <form id="setup-form" class="setup-form">
+            <div class="form-group">
+                <label for="descriptor">CT Descriptor</label>
+                <textarea id="descriptor" name="descriptor" class="descriptor-input"
+                    placeholder="ct(slip77(...),wpkh([fingerprint/84'/1'/0']xpub.../0/*))" rows="4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="currency">Currency</label>
+                <select id="currency" name="currency" class="currency-select" required>
+                    <option value="USD">🇺🇸 USD - US Dollar</option>
+                    <option value="EUR">🇪🇺 EUR - Euro</option>
+                    <option value="CHF">🇨🇭 CHF - Swiss Franc</option>
+                    <option value="GBP">🇬🇧 GBP - British Pound</option>
+                    <option value="INR">🇮🇳 INR - Indian Rupee</option>
+                    <option value="CAD">🇨🇦 CAD - Canadian Dollar</option>
+                    <option value="ARS">🇦🇷 ARS - Argentine Peso</option>
+                    <option value="AUD">🇦🇺 AUD - Australian Dollar</option>
+                    <option value="BRL">🇧🇷 BRL - Brazilian Real</option>
+                    <option value="CNY">🇨🇳 CNY - Chinese Yuan</option>
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-gear" name="show-gear">
+                    <span>Show setup gear on POS page</span>
+                </label>
+                <small class="form-hint">Allow access to setup from the POS interface</small>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-description" name="show-description" checked>
+                    <span>Show description field on POS page</span>
+                </label>
+                <small class="form-hint">Allow adding a note to invoices</small>
+            </div>
+
+            <div id="setup-message" class="message"></div>
+
+            <button type="submit" id="generate-link" class="submit-button" disabled>
+                Generate POS Link
+            </button>
+        </form>
+
+        <div id="generated-link-section" class="generated-link-section" hidden>
+            <h2>Your POS Link</h2>
+            <div class="link-display">
+                <input type="text" id="generated-link" class="link-input" readonly>
+                <button type="button" id="copy-link" class="copy-button" title="Copy to clipboard">📋</button>
+            </div>
+            <div id="qr-container" class="qr-container">
+                <a id="qr-link" href="#" target="_blank">
+                    <img id="qr-image" alt="QR Code"
+                        style="image-rendering: pixelated; border: 20px solid white; width: 280px; height: 280px;">
+                </a>
+            </div>
+            <p class="link-hint">Share this link with your staff to receive payments</p>
+            <a href="#" id="open-pos-link" class="open-pos-button">Open POS →</a>
+        </div>
+
+        <div class="wasm-status" id="wasm-status">
+            <span class="status-indicator loading"></span>
+            <span class="status-text">Loading WASM module...</span>
+        </div>
+    </template>
+
+    <!-- POS Page Template -->
+    <template id="pos-page-template">
+        <div class="header">
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Bitcoin POS</h1>
+                <a href="#" id="setup-link" class="setup-link" title="Back to Setup">⚙️</a>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <section class="left-section">
+                <div class="input-mode-toggle">
+                    <button type="button" class="mode-button active" id="mode-fiat">Fiat</button>
+                    <button type="button" class="mode-button" id="mode-sats">Sats</button>
+                </div>
+
+                <div class="display" id="primary-display">
+                    <span class="amount-value" id="amount">0.00</span>
+                    <span class="currency-code" id="currency-code">USD</span>
+                </div>
+
+                <div class="satoshi-display" id="secondary-display">
+                    <span class="satoshi-value" id="satoshi-amount">0</span>
+                    <span class="satoshi-symbol">sats</span>
+                </div>
+
+                <div class="rate-display" id="rate-display">
+                    <span class="rate-label">1 BTC =</span>
+                    <span class="rate-value" id="rate-value">--</span>
+                    <span class="rate-currency" id="rate-currency">USD</span>
+                </div>
+
+                <div class="description-section">
+                    <label for="description">Description (optional)</label>
+                    <input type="text" id="description" class="description-input"
+                        placeholder="e.g., Coffee, Sandwich..." maxlength="100">
+                </div>
+            </section>
+
+            <section class="right-section">
+                <div class="keypad">
+                    <button class="key" data-value="1">1</button>
+                    <button class="key" data-value="2">2</button>
+                    <button class="key" data-value="3">3</button>
+                    <button class="key" data-value="4">4</button>
+                    <button class="key" data-value="5">5</button>
+                    <button class="key" data-value="6">6</button>
+                    <button class="key" data-value="7">7</button>
+                    <button class="key" data-value="8">8</button>
+                    <button class="key" data-value="9">9</button>
+                    <button class="key zero" data-value="0">0</button>
+                    <button class="key" data-value=".">.</button>
+                </div>
+
+                <div class="keypad-actions">
+                    <button class="key danger" id="backspace">⌫</button>
+                    <button class="key secondary" id="clear">Clear</button>
+                </div>
+
+                <button class="submit-button" id="submit" disabled>Create Invoice</button>
+            </section>
+        </div>
+
+        <div class="wasm-status" id="wasm-status">
+            <span class="status-indicator loading"></span>
+            <span class="status-text">Loading wallet...</span>
+        </div>
+
+        <footer class="pos-footer">
+            <span class="wallet-id" id="wallet-id" title="Wallet ID">Loading wallet...</span>
+        </footer>
+    </template>
+
+    <!-- Receive Page Template -->
+    <template id="receive-page-template">
+        <div class="header">
+            <div class="header-row">
+                <div class="bitcoin-symbol">₿</div>
+                <h1>Payment Request</h1>
+            </div>
+        </div>
+
+        <div class="receive-container">
+            <div class="amount-summary">
+                <div class="amount-row">
+                    <span class="amount-label">Amount</span>
+                    <span class="amount-sats" id="receive-sats">0 sats</span>
+                </div>
+                <div class="amount-row secondary">
+                    <span class="amount-fiat" id="receive-fiat">≈ $0.00</span>
+                </div>
+            </div>
+
+            <div class="qr-section">
+                <a id="invoice-qr-link" href="#">
+                    <img id="invoice-qr" alt="Lightning Invoice QR"
+                        style="image-rendering: pixelated; border: 16px solid white; width: 240px; height: 240px;">
+                </a>
+            </div>
+
+            <div class="invoice-section">
+                <label for="invoice-text">Lightning Invoice</label>
+                <div class="invoice-display">
+                    <textarea id="invoice-text" class="invoice-textarea" readonly></textarea>
+                    <button type="button" id="copy-invoice" class="copy-button" title="Copy to clipboard">📋</button>
+                </div>
+            </div>
+
+            <button type="button" id="back-to-pos" class="submit-button secondary-button">← New Payment</button>
+        </div>
+
+        <div class="wasm-status" id="wasm-status">
+            <span class="status-indicator loading"></span>
+            <span class="status-text">Waiting for payment...</span>
+        </div>
+
+        <footer class="pos-footer">
+            <span class="wallet-id" id="wallet-id"></span>
+        </footer>
+    </template>
+
+    <!-- Error Page Template -->
+    <template id="error-page-template">
+        <div class="header">
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Bitcoin POS</h1>
+        </div>
+
+        <div class="error-container">
+            <div class="error-icon">⚠️</div>
+            <h2>Invalid Configuration</h2>
+            <p class="error-message" id="error-message">The provided link is invalid or malformed.</p>
+            <a href="./" class="submit-button error-button">Go to Setup</a>
+        </div>
+    </template>
+
+    <script>
+        // Dynamic manifest: set manifest href dynamically to include config in start_url
+        // The link starts without href to prevent Chrome from caching the default manifest
+        (async function setupDynamicManifest() {
+            const manifestLink = document.getElementById('manifest-link');
+            if (!manifestLink) return;
+
+            try {
+                const response = await fetch('./manifest.json');
+                const manifest = await response.json();
+
+                // Get config from hash (preferred) or query string
+                const configString = window.location.hash.slice(1) || window.location.search.slice(1);
+
+                // Build absolute start_url (required since manifest is a blob URL)
+                const baseUrl = window.location.origin + window.location.pathname;
+                if (configString) {
+                    manifest.start_url = `${baseUrl}?${configString}`;
+                } else {
+                    manifest.start_url = baseUrl;
+                }
+
+                // Create blob URL with manifest and set it
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                manifestLink.setAttribute('href', URL.createObjectURL(blob));
+
+                console.log('Manifest set with start_url:', manifest.start_url);
+            } catch (error) {
+                console.error('Dynamic manifest error:', error);
+                // Fallback: set static manifest
+                manifestLink.setAttribute('href', './manifest.json');
+            }
+        })();
+
+        // Register service worker for offline support (production only)
+        if ('serviceWorker' in navigator) {
+            const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+            if (!isLocalhost) {
+                // In production: register service worker
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => console.log('Service Worker registered'))
+                    .catch((err) => console.log('Service Worker registration failed:', err));
+            }
+        }
+    </script>
+    <script src="bootstrap.js"></script>
+</body>
+
+</html>

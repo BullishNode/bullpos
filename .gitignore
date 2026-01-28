@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+
+# SQLite databases (backend)
+*.db
+*.sqlite
+*.sqlite3
+
+# CLAUDE.md files - gitignored, never sync
+CLAUDE.md
+**/CLAUDE.md
+
+# Secrets
+credentials.json
+*.pem
+*.key

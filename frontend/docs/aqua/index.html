@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqua Wallet - CT Descriptor Tutorial</title>
+    <meta name="description"
+        content="Step-by-step guide to export your Liquid CT (Confidential Transaction) descriptor from Aqua wallet by JAN3 for use with Bitcoin POS.">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='72' font-size='72' font-weight='bold' fill='%23f7931a' text-anchor='middle'>₿</text></svg>">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="../../styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+</head>
+
+<body>
+    <main class="container docs-container">
+        <header class="header">
+            <a href="../" class="back-link">← Back to Tutorials</a>
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Aqua Wallet</h1>
+            <p class="subtitle">Export your CT descriptor from Aqua wallet by JAN3</p>
+        </header>
+
+        <section class="tutorial-intro">
+            <p>Aqua is a mobile Bitcoin wallet developed by JAN3 that supports both Bitcoin and the Liquid Network. This
+                tutorial shows you how to export your Liquid CT (Confidential Transaction) descriptor, which allows you
+                to receive payments on the Liquid Network using Bitcoin POS without exposing your private keys.</p>
+        </section>
+
+        <section class="tutorial-content">
+            <div class="screenshot-gallery">
+                <figure class="screenshot-item">
+                    <span class="step-number">1</span>
+                    <img src="Screenshot_20251217-161600-stroke.png"
+                        alt="Aqua wallet main screen showing Bitcoin and Liquid balances with Settings tab highlighted in the bottom navigation">
+                    <figcaption>
+                        <h3>Open Settings</h3>
+                        <p>From the main Aqua wallet screen, tap the <strong>Settings</strong> icon in the bottom
+                            navigation bar. You'll see your Savings Account (Bitcoin) and Spending Accounts (L-BTC and
+                            Tether) on this screen.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">2</span>
+                    <img src="Screenshot_20251217-161619-stroke.png"
+                        alt="Aqua Settings menu showing Advanced Settings options with Watch-Only option highlighted">
+                    <figcaption>
+                        <h3>Navigate to Watch-Only</h3>
+                        <p>In the Settings menu, find the <strong>Advanced Settings</strong> section and tap on
+                            <strong>Watch-Only</strong>. This feature allows you to export your wallet's public
+                            information without exposing your private keys.
+                        </p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">3</span>
+                    <img src="Screenshot_20251217-161628-stroke.png"
+                        alt="Export Watch-Only Wallet screen showing Bitcoin and Liquid options with Liquid Nested SegWit option highlighted">
+                    <figcaption>
+                        <h3>Select Liquid Wallet</h3>
+                        <p>On the Export Watch-Only Wallet screen, you'll see options for both Bitcoin and Liquid. Tap
+                            on <strong>Liquid</strong> (Nested SegWit) to generate the CT descriptor for your Liquid
+                            wallet.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">4</span>
+                    <img src="Screenshot_20251217-161638-stroke.png"
+                        alt="Liquid Watch-Only Export screen displaying QR code and descriptor text with copy button highlighted">
+                    <figcaption>
+                        <h3>Copy the Descriptor</h3>
+                        <p>Your Liquid CT descriptor will be displayed as both a QR code and text. Tap the <strong>copy
+                                button</strong> next to the descriptor text to copy it to your clipboard. You can now
+                            paste this descriptor into Bitcoin POS to receive Liquid payments.</p>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="tutorial-note">
+            <h2>Security Note</h2>
+            <p>The CT descriptor is a watch-only credential that allows you to generate receiving addresses and monitor
+                your balance. It does not contain your private keys, so sharing it with Bitcoin POS is safe and will not
+                give anyone the ability to spend your funds.</p>
+        </section>
+
+        <footer class="docs-footer">
+            <a href="../../" class="back-link">← Back to Bitcoin POS Setup</a>
+        </footer>
+    </main>
+</body>
+
+</html>

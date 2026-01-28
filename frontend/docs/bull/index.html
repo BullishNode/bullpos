@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bull Bitcoin - CT Descriptor Tutorial</title>
+    <meta name="description" content="Step-by-step guide to export your Liquid CT (Confidential Transaction) descriptor from Bull Bitcoin wallet for use with Bitcoin POS.">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='72' font-size='72' font-weight='bold' fill='%23f7931a' text-anchor='middle'>₿</text></svg>">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="../../styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+</head>
+
+<body>
+    <main class="container docs-container">
+        <header class="header">
+            <a href="../" class="back-link">← Back to Tutorials</a>
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Bull Bitcoin</h1>
+            <p class="subtitle">Export your CT descriptor from Bull Bitcoin wallet</p>
+        </header>
+
+        <section class="tutorial-intro">
+            <p>Bull Bitcoin is a Canadian self-custodial Bitcoin wallet that supports the Liquid Network for instant, low-fee payments. This tutorial shows you how to export your Liquid CT (Confidential Transaction) descriptor to use with Bitcoin POS for receiving Liquid payments.</p>
+        </section>
+
+        <section class="tutorial-content">
+            <div class="screenshot-gallery">
+                <figure class="screenshot-item">
+                    <span class="step-number">1</span>
+                    <img src="Screenshot_20251217-161411-stroke.png" alt="Bull Bitcoin main wallet screen showing Instant payments section highlighted for Liquid and Lightning network">
+                    <figcaption>
+                        <h3>Select Instant Payments</h3>
+                        <p>From the main Bull Bitcoin wallet screen, tap on <strong>Instant payments</strong> (Liquid and Lightning network). This section manages your Liquid wallet for fast, confidential transactions.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">2</span>
+                    <img src="Screenshot_20251217-161454-stroke.png" alt="Instant Payments screen showing transaction history with settings gear icon highlighted in top right corner">
+                    <figcaption>
+                        <h3>Open Wallet Settings</h3>
+                        <p>On the Instant Payments screen, tap the <strong>settings gear icon</strong> in the top right corner. This will take you to the wallet configuration options where you can access your descriptor.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">3</span>
+                    <img src="Screenshot_20251217-161520-stroke.png" alt="Instant payments settings menu showing Wallet Details option highlighted">
+                    <figcaption>
+                        <h3>Access Wallet Details</h3>
+                        <p>In the settings menu, tap on <strong>Wallet Details</strong>. This section contains your wallet's technical information including the CT descriptor needed for Bitcoin POS.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">4</span>
+                    <img src="Screenshot_20251217-161529-stroke.png" alt="Wallet Details screen showing Descriptor section with Copy button highlighted, displaying address type as Confidential Segwit on Liquid Network">
+                    <figcaption>
+                        <h3>Copy the Descriptor</h3>
+                        <p>Scroll down to find the <strong>Descriptor</strong> section. You'll see it shows "Confidential Segwit" as the address type and "Liquid Network" as the network. Tap the <strong>Copy</strong> button to copy the descriptor to your clipboard for use with Bitcoin POS.</p>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="tutorial-note">
+            <h2>Security Note</h2>
+            <p>The CT descriptor is a watch-only credential that allows you to generate receiving addresses and monitor your balance. It does not contain your private keys, so sharing it with Bitcoin POS is safe and will not give anyone the ability to spend your funds.</p>
+        </section>
+
+        <footer class="docs-footer">
+            <a href="../../" class="back-link">← Back to Bitcoin POS Setup</a>
+        </footer>
+    </main>
+</body>
+
+</html>

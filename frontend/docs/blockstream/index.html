@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockstream Green - CT Descriptor Tutorial</title>
+    <meta name="description"
+        content="Step-by-step guide to export your Liquid CT (Confidential Transaction) descriptor from Blockstream Green wallet for use with Bitcoin POS.">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='72' font-size='72' font-weight='bold' fill='%23f7931a' text-anchor='middle'>₿</text></svg>">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="../../styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+</head>
+
+<body>
+    <main class="container docs-container">
+        <header class="header">
+            <a href="../" class="back-link">← Back to Tutorials</a>
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Blockstream Green</h1>
+            <p class="subtitle">Export your CT descriptor from Blockstream Green wallet</p>
+        </header>
+
+        <section class="tutorial-intro">
+            <p>Blockstream Green is a secure Bitcoin wallet developed by Blockstream, the company behind the Liquid
+                Network. This tutorial shows you how to export your Liquid CT (Confidential Transaction) descriptor to
+                use with Bitcoin POS for receiving private Liquid payments.</p>
+        </section>
+
+
+        <section class="tutorial-content">
+            <div class="screenshot-gallery">
+                <figure class="screenshot-item">
+                    <span class="step-number">1</span>
+                    <img src="Screenshot_20251217-1-stroke.png"
+                        alt="Blockstream Green home screen showing Assets list with Liquid Bitcoin highlighted">
+                    <figcaption>
+                        <h3>Select Liquid Bitcoin</h3>
+                        <p>From the Blockstream Green home screen, locate your <strong>Liquid Bitcoin</strong> under the
+                            Assets section and tap on it. This is your L-BTC wallet on the Liquid Network.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">2</span>
+                    <img src="Screenshot_20251217-2-stroke.png"
+                        alt="Liquid Bitcoin account selection screen showing Legacy SegWit Account highlighted">
+                    <figcaption>
+                        <h3>Choose Your Account</h3>
+                        <p>Select your <strong>Legacy SegWit Account</strong> or another single signature account type.
+                            Note: 2FA Protected
+                            accounts are not supported as they use a legacy format that cannot be represented as CT
+                            descriptors.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">3</span>
+                    <img src="Screenshot_20251217-3-stroke.png"
+                        alt="Liquid Bitcoin account screen showing transaction history with three-dot menu icon highlighted in top right corner">
+                    <figcaption>
+                        <h3>Open Account Menu</h3>
+                        <p>On your account screen, tap the <strong>three-dot menu icon</strong> in the top right corner.
+                            This opens additional options including the watch-only export feature.</p>
+                    </figcaption>
+                </figure>
+                <figure class="screenshot-item">
+                    <span class="step-number">4</span>
+                    <img src="Screenshot_20251217-4-stroke.png"
+                        alt="Watch-only screen showing Output Descriptors with copy button highlighted next to the Legacy SegWit Account descriptor">
+                    <figcaption>
+                        <h3>Copy the Descriptor</h3>
+                        <p>On the Watch-only screen, you'll see your <strong>Output Descriptors</strong>. The app
+                            explains that you can use your descriptor to view your balance while keeping private keys
+                            offline. Tap the <strong>copy button</strong> next to your account descriptor to copy it for
+                            use with Bitcoin POS.</p>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section class="tutorial-note">
+            <h2>Security Note</h2>
+            <p>The CT descriptor is a watch-only credential that allows you to generate receiving addresses and monitor
+                your balance. It does not contain your private keys, so sharing it with Bitcoin POS is safe and will not
+                give anyone the ability to spend your funds.</p>
+        </section>
+
+        <footer class="docs-footer">
+            <a href="../../" class="back-link">← Back to Bitcoin POS Setup</a>
+        </footer>
+    </main>
+</body>
+
+</html>

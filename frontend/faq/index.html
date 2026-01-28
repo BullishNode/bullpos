@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Bitcoin POS</title>
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='72' font-size='72' font-weight='bold' fill='%23f7931a' text-anchor='middle'>₿</text></svg>">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="../styles.css">
+    <script defer data-domain="btcpos.cash" src="https://plausible.casatta.it/js/script.js"></script>
+</head>
+
+<body>
+    <main class="container docs-container">
+        <header class="header">
+            <a href="../" class="back-link">← Back to Setup</a>
+            <div class="bitcoin-symbol">₿</div>
+            <h1>Frequently Asked Questions</h1>
+            <p class="subtitle">Everything you need to know about Bitcoin POS</p>
+        </header>
+
+        <section class="faq-section">
+            <div class="faq-item">
+                <h2>What is btcpos.cash ?</h2>
+                <p>btcpos.cash is a point-of-sale system that allows merchants to easily accept Bitcoin lightning
+                    payments
+                    without running a node. This is possible by leveraging the Liquid network and the Boltz exchange.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h2>How does it work?</h2>
+                <p>Bitcoin POS is configured with your Liquid wallet's confidential descriptor (<a
+                        href="">ELIP-151</a>),
+                    See our <a href="../docs/">CT Descriptor Tutorials</a> for supported wallet.
+                    The CT descriptor allows to generate wallet addresses but not sign transactions and spend funds.
+                    It is what is called a watch-only wallet.
+                    With the wallet address an invoice is createad using <a href="https://boltz.exchange/">Boltz</a>
+                    exchange,
+                    this is the step that requires the payment of the fees.</p>
+            </div>
+
+            <div class="faq-item" id="fees">
+                <h2>Why are there fees?</h2>
+                <p>The fee of 0.25% + 50 sats per invoice is charged entirely by the
+                    <a href="https://boltz.exchange/">Boltz exchange</a> service to perform the Lightning-to-Liquid
+                    swap.
+                    <strong>btcpos.cash does not add any markup</strong> on top of this.
+                </p>
+                <p>In exchange for this small fee, you get significant advantages:</p>
+                <ul>
+                    <li><strong>No node required</strong> — You don't need to run or maintain a Lightning node,
+                        which typically requires technical expertise, 24/7 uptime, and channel management.</li>
+                    <li><strong>No registration</strong> — There's no sign-up process, no accounts to create,
+                        and no KYC. Just configure your wallet descriptor and start accepting payments immediately.</li>
+                    <li><strong>Self-custody</strong> — Funds go directly to your Liquid wallet.
+                        You maintain full control of your money at all times.</li>
+                </ul>
+            </div>
+
+            <div class="faq-item" id="recovery">
+                <h2>Rescue file</h2>
+                <p>A reverse submarine swap, also known as a Lightning-to-Liquid swap, never
+                    trap user funds, meaning that if the merchant wallet is not claiming funds,
+                    the lightning payment don't get through. In other words, there is never a situation
+                    where the payer wallet show a payment get through and the merchant wallet don't receive it.<br>
+
+                    However, the POS is generating a mnemonic to spend the claim script and claim the funds.
+                    This mnemonic is generated randomly and stored locally in your browser.<br>
+
+                    It is available for download by triple-clicking on the wallet ID at the bottom of the page.
+                    The format is compatible with the <a href="https://boltz.exchange/">Boltz exchange</a> recovery
+                    tool.
+                </p>
+            </div>
+
+            <div class="faq-item" id="supply-chain">
+                <h2>Mitigating supply chain attacks</h2>
+                <p>Since btcpos.cash runs entirely in your browser, you're trusting the server to deliver
+                    unmodified code each time you load the page. A compromised server could theoretically
+                    serve malicious code that leaks your descriptor or misdirects payments.</p>
+
+                <p>To mitigate this risk, you can <strong>install the app locally</strong> using your browser's
+                    "Install as app" feature. Once installed, the app runs from your device's cache and no longer
+                    fetches code from the server on each use.</p>
+
+                <br>
+                <p><strong>How to install:</strong></p>
+                <ol>
+                    <li>Configure your POS and generate the link (e.g., <code>https://btcpos.cash/#eyJ...</code>)</li>
+                    <li>In the URL bar, <strong>replace <code>#</code> with <code>?</code></strong>
+                        (e.g., <code>https://btcpos.cash/?eyJ...</code>)</li>
+                    <li>Navigate to the modified URL</li>
+                    <li>In Chrome: click the install icon in the address bar, or use Menu → "Install Bitcoin POS"</li>
+                    <li>The app is now installed with your configuration baked in</li>
+                </ol>
+
+                <br>
+                <p><strong>Why replace # with ?</strong></p>
+                <br>
+                <p>
+                    The <code>#</code> fragment is normally used because it's never sent to the server, protecting
+                    your descriptor privacy. However, browsers strip the <code>#</code> fragment when installing
+                    as an app. Using <code>?</code> preserves the configuration in the installed app's start URL.
+                    The privacy trade-off is minimal since you're already trusting the server at install time.
+                    After installation, the app works offline and your configuration
+                    remains private — it's only stored locally on your device.
+                </p>
+
+
+            </div>
+
+            <div class="faq-item" id="tracking">
+                <h2>Does this site track me?</h2>
+                <p>We are committed to the highest standards of privacy. Unlike many other services, btcpos.cash does
+                    not use Google Tags, Google Analytics, or any other tracking tools from major advertising networks.
+                    We believe your business activities and financial privacy should not be part of a global advertising
+                    profile.</p>
+
+                <p>To monitor site performance without compromising your anonymity, we use Plausible Analytics.
+                    Plausible is a privacy-first, cookie-less tool that does not collect personal data or track you
+                    across different websites.</p>
+
+                <p>Furthermore, to ensure maximum security and privacy:</p>
+
+                <ul>
+                    <li><strong>Self-Hosted Script:</strong> The Plausible JavaScript is served from a domain owned and
+                        managed by the site owner.</li>
+                    <li><strong>No Third-Party Requests:</strong> By hosting the script ourselves, we ensure that your
+                        browser never makes a request to a third-party analytics server, preventing external entities
+                        from logging your IP address or visit.</li>
+                    <li><strong>Privacy First:</strong> We only see aggregated, anonymous data that helps us understand
+                        how the site is being used so we can continue to improve the service for everyone.</li>
+                </ul>
+            </div>
+
+        </section>
+
+        <footer class="docs-footer">
+            <p>Can't find what you're looking for?
+                <a href="https://x.com/btcpos_cash/">contact us</a> for support.
+            </p>
+        </footer>
+    </main>
+</body>
+
+</html>
