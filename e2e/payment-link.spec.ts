@@ -129,7 +129,7 @@ test.describe('Amount Entry', () => {
     await expect(page.locator('#amount')).toContainText('123');
 
     // Backspace
-    await page.click('button:has-text("⌫")');
+    await page.click('#backspace');
     await expect(page.locator('#amount')).toContainText('12');
   });
 });
@@ -140,6 +140,9 @@ test.describe('Currency Mode Switching', () => {
     await page.goto(`/#${encoded}`);
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
+
+    // Wait for mode buttons to be initialized with active class
+    await expect(page.locator('#mode-fiat')).toHaveClass(/active/, { timeout: 5000 });
 
     // Should start in fiat mode
     await expect(page.locator('#mode-fiat')).toHaveClass(/active/);
@@ -161,12 +164,13 @@ test.describe('Currency Mode Switching', () => {
 
     await page.waitForSelector('.bitcoin-symbol', { timeout: 10000 });
 
-    // Wait for rate to load (may take a moment)
-    await page.waitForSelector('#rate-display', { timeout: 15000 });
+    // Wait for rate value to actually populate (not just the template container)
+    await expect(page.locator('#rate-value')).not.toHaveText('--', { timeout: 15000 });
 
     // Check rate display exists and has content
-    const rateText = await page.locator('#rate-display').textContent();
+    const rateText = await page.locator('#rate-value').textContent();
     expect(rateText).toBeTruthy();
+    expect(rateText).not.toBe('--');
   });
 });
 

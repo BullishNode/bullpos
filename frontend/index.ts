@@ -1253,7 +1253,12 @@ async function syncWallet(wollet: lwk.Wollet): Promise<void> {
 async function init(): Promise<void> {
     console.log('Bitcoin POS initializing...');
 
-    // Route to correct page immediately (before WASM loads)
+    // Mark WASM as ready BEFORE routing
+    setWasmReady(true);
+    console.log('LWK WASM module loaded successfully');
+    console.log('Network:', network.toString());
+
+    // Route to correct page (now that WASM is ready)
     route();
 
     // Handle hash changes (browser back/forward)
@@ -1261,11 +1266,6 @@ async function init(): Promise<void> {
         stopRateUpdates();
         route();
     });
-
-    // Mark WASM as ready
-    setWasmReady(true);
-    console.log('LWK WASM module loaded successfully');
-    console.log('Network:', network.toString());
 }
 
 // Start the app
