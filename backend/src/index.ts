@@ -6,9 +6,14 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import { initializeDatabase } from './db/schema';
 import { merchantsRouter } from './routes/merchants.routes';
+import { authRouter } from './routes/auth.routes';
+import { linksRouter } from './routes/links.routes';
+import { backupsRouter } from './routes/backups.routes';
+import { publicRateLimiter } from './middleware/rate-limit';
+import { validateGeneralPayloadSize } from './middleware/size-limit';
+import { requestLogger, securityEventLogger, errorLogger } from './middleware/logging';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,14 +35,17 @@ app.set('trust proxy', 1);
 // Security middleware
 app.use(helmet());
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Allow larger payloads for encrypted blobs
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
+// Request logging (should be early in middleware chain)
+app.use(requestLogger);
+app.use(securityEventLogger);
+
+// Payload size validation
+app.use(express.json({ limit: '10mb' })); // Allow larger payloads for encrypted blobs
+app.use(validateGeneralPayloadSize);
+
+// Global rate limiting for all endpoints
+app.use(publicRateLimiter);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -46,24 +54,19 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/merchants', merchantsRouter);
+app.use('/api', authRouter); // Includes /api/merchants/register and /api/auth/login
+app.use('/api/links', linksRouter);
+app.use('/api/backups', backupsRouter);
 
 // Global error handler (must be after all routes)
+app.use(errorLogger);
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// TODO: Add remaining routes
-// - POST /api/auth/login
-// - POST /api/merchants/register
-// - POST /api/links
-// - GET /api/links/:id
-// - GET /api/links
-// - DELETE /api/links/:id
-// - POST /api/backups
-// - PUT /api/backups/:id
-// - GET /api/backups
-// - GET /api/backups/:id
+// Note: Route handlers are stubs (501 responses) pending full implementation in issue #7
+// Rate limiting and size validation middleware are now in place and ready to use
 
 app.listen(PORT, () => {
   console.log(`BullPOS Backend running on port ${PORT}`);
