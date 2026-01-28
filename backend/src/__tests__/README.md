@@ -46,6 +46,8 @@ Tests rate limiting behavior:
 
 ## Dependencies
 
+⚠️ **IMPORTANT: Tests are currently skipped pending backend implementation**
+
 These tests depend on the backend implementation from **Issue #7**, which includes:
 - Database schema (merchants, payment_links, swap_backups)
 - Authentication routes (`POST /api/auth/login`, `POST /api/merchants/register`)
@@ -54,6 +56,11 @@ These tests depend on the backend implementation from **Issue #7**, which includ
 - Backup routes (`POST/PUT/GET /api/backups`)
 - Auth middleware for JWT validation
 - Rate limiting middleware
+
+**Current Status:**
+- All integration tests are wrapped with `describe.skip()` to prevent CI failures
+- Tests will be enabled once Issue #7 is merged to main
+- Tests serve as API contract documentation for the expected backend behavior
 
 ## Running Tests
 
@@ -94,8 +101,23 @@ These integration tests verify:
 
 ## Notes
 
-- Tests assume the backend implementation from Issue #7 exists
+- **Tests are skipped** - They will be enabled when Issue #7 backend implementation is merged
+- Tests serve as **API contract specification** for backend implementers
 - Tests use the zero-knowledge security model (encrypted data only)
 - Public endpoints (link fetch, backup create/update) don't require auth
 - Authenticated endpoints verify ownership and enforce authorization
 - Rate limiting uses merchant ID as key for authenticated endpoints
+- PGP key validation ensures keys have proper structure and format
+
+## Enabling Tests
+
+Once Issue #7 is merged, enable these tests by:
+
+1. Remove `.skip` from all `describe.skip()` statements in test files
+2. Verify API contract matches test expectations:
+   - Field names (email vs username, merchantId structure, etc.)
+   - Response structure (nested objects vs flat fields)
+   - Rate limit header names
+   - Crypto payload format (ciphertext + tag vs encryptedPayload)
+3. Run tests to verify backend implementation: `npm test`
+4. Fix any mismatches between test expectations and actual API responses
