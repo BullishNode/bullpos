@@ -10,6 +10,7 @@ const API_BASE_URL = 'https://api.btcpos.cash';
 export interface BackupUploadResponse {
     success: boolean;
     backupId: string;
+    writeToken: string; // Required for updating backup after claim
     swapId: string;
     timestamp: string;
 }
@@ -58,18 +59,71 @@ export async function uploadSwapBackup(
             throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
 
-        const data: BackupUploadResponse = await response.json();
+        const data = await response.json();
 
-        if (!data.success) {
-            throw new Error('Backup upload reported failure');
-        }
-
-        return data;
+        // Map backend response to frontend interface
+        return {
+            success: true,
+            backupId: data.id,
+            writeToken: data.writeToken,
+            swapId: backup.swapId,
+            timestamp: data.createdAt,
+        };
     } catch (error) {
         if (error instanceof Error) {
             throw new Error(`Failed to upload swap backup: ${error.message}`);
         }
         throw new Error('Failed to upload swap backup: Unknown error');
+    }
+}
+
+/**
+ * Update backup status and/or encrypted data after swap completion
+ * @param backupId - The backup ID returned from initial upload
+ * @param writeToken - The write token returned from initial upload
+ * @param status - New status (e.g., 'claimed', 'failed')
+ * @param encryptedData - Optional new encrypted data with claim details
+ * @returns Updated backup confirmation
+ * @throws Error if the update fails
+ */
+export async function updateSwapBackup(
+    backupId: string,
+    writeToken: string,
+    status: string,
+    encryptedData?: string
+): Promise<{ success: boolean }> {
+    const url = `${API_BASE_URL}/api/backups/${backupId}`;
+
+    const payload: { writeToken: string; status: string; encryptedData?: string } = {
+        writeToken,
+        status,
+    };
+
+    if (encryptedData) {
+        payload.encryptedData = encryptedData;
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => response.statusText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        return { success: true };
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update swap backup: ${error.message}`);
+        }
+        throw new Error('Failed to update swap backup: Unknown error');
     }
 }
 

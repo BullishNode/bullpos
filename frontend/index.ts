@@ -8,9 +8,11 @@ import {
     setInvoiceResponse,
     setExchangeRate, getExchangeRate,
     setWasmReady, isWasmReady,
+    setCurrentBackup, getCurrentBackup,
     subscribe
 } from './state'
 import { createAndUploadBackup, validateBackupSuccess } from './src/services/backup'
+import { updateBackupAfterClaim } from './src/services/claim'
 
 // Constants
 const SATOSHIS_PER_BTC: number = 100_000_000;
@@ -772,6 +774,26 @@ function initPosPage(config: POSConfig): void {
                     // Validate backup was successful
                     validateBackupSuccess(backupResult);
                     console.log('✅ Backup uploaded and validated successfully');
+
+                    // Store backup info for later update after claim
+                    setCurrentBackup({
+                        backupId: backupResult.backupId,
+                        writeToken: backupResult.writeToken,
+                        swapId: backupResult.swapId,
+                        merchantId: config.m,
+                        originalData: {
+                            swapId: invoice.swapId(),
+                            mnemonic: storedMnemonic,
+                            amountSatoshis: satoshis,
+                            bolt11Invoice: invoice.bolt11Invoice().toString(),
+                            timestamp: new Date().toISOString(),
+                            metadata: {
+                                fiatAmount: fiatAmount,
+                                currency: currencyAlpha3,
+                                description: description || undefined,
+                            },
+                        },
+                    });
                 } catch (backupError) {
                     console.error('Failed to upload backup:', backupError);
                     // Restore button state
@@ -994,7 +1016,7 @@ function initPosPage(config: POSConfig): void {
  * @param invoice - The InvoiceResponse from Boltz
  * @param onComplete - Callback when payment completes
  */
-function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: boolean) => void): void {
+function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: boolean, claimTxid?: string) => void): void {
     setTimeout(async () => {
         try {
             console.log("Starting completePay in background...");
@@ -1002,7 +1024,52 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
             console.log("Swap ID:", swapId);
             const completed = await invoice.completePay();
             console.log("completePay finished with result:", completed);
-            onComplete(completed);
+
+            if (completed) {
+                // After successful claim, update backup with claim details
+                const backupInfo = getCurrentBackup();
+                if (backupInfo && backupInfo.swapId === swapId) {
+                    console.log("Updating backup after successful claim...");
+
+                    try {
+                        // Try to get preimage if available from invoice
+                        // Note: lwk may provide this through a method like invoice.preimage()
+                        // For now, we'll update without it and add it when we know the API
+                        let preimage: string | undefined;
+                        try {
+                            // Attempt to get preimage - this may need adjustment based on lwk API
+                            type InvoiceWithPreimage = lwk.InvoiceResponse & { preimage?: () => string };
+                            const invoiceWithPreimage = invoice as InvoiceWithPreimage;
+                            if (typeof invoiceWithPreimage.preimage === 'function') {
+                                preimage = invoiceWithPreimage.preimage();
+                            }
+                        } catch (e) {
+                            console.warn("Could not retrieve preimage:", e);
+                        }
+
+                        await updateBackupAfterClaim(
+                            backupInfo.merchantId,
+                            backupInfo.backupId,
+                            backupInfo.writeToken,
+                            {
+                                swapId: swapId,
+                                preimage: preimage,
+                                claimTxid: undefined, // lwk handles claim internally
+                                originalBackupData: backupInfo.originalData,
+                            }
+                        );
+
+                        console.log("✅ Backup updated after claim");
+                    } catch (updateError) {
+                        console.error("Failed to update backup after claim:", updateError);
+                        // Don't fail the whole operation - the claim was successful
+                    }
+                }
+
+                onComplete(true);
+            } else {
+                onComplete(false);
+            }
         } catch (error) {
             console.error("Error in completePay:", error);
             onComplete(false);
@@ -1082,7 +1149,7 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
     });
 
     // Spawn background task to wait for payment completion
-    spawnCompletePay(invoice, (success: boolean) => {
+    spawnCompletePay(invoice, (success: boolean, claimTxid?: string) => {
         if (success) {
             // Payment completed successfully
             statusIndicator.classList.remove('loading');
@@ -1103,6 +1170,14 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
             `)}`;
             invoiceQr.classList.add('payment-success');
             invoiceQr.src = checkmarkSvg;
+
+            // Display claim transaction link if available
+            if (claimTxid) {
+                // TODO: Add UI element to display transaction link
+                console.log('Claim transaction:', claimTxid);
+                const txLink = `https://liquid.network/tx/${claimTxid}`;
+                console.log('Transaction link:', txLink);
+            }
         } else {
             // Payment failed or timed out
             statusIndicator.classList.remove('loading');

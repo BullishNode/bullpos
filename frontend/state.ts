@@ -5,6 +5,16 @@ import * as lwk from "lwk_wasm"
 /**
  * Private state object containing all application state
  */
+import type { SwapBackupData } from './src/types/backup';
+
+interface BackupInfo {
+    backupId: string;
+    writeToken: string;
+    swapId: string;
+    merchantId: string;
+    originalData: SwapBackupData;
+}
+
 const _state: {
     pricesFetcher: lwk.PricesFetcher | null;
     esploraClient: lwk.EsploraClient | null;
@@ -14,6 +24,7 @@ const _state: {
     invoiceResponse: lwk.InvoiceResponse | null;
     exchangeRate: number | null;
     wasmReady: boolean;
+    currentBackup: BackupInfo | null;
 } = {
     // Prices fetcher for exchange rates
     pricesFetcher: null,
@@ -38,6 +49,9 @@ const _state: {
 
     // Whether WASM module is loaded and ready
     wasmReady: false,
+
+    // Current backup info for updating after claim
+    currentBackup: null,
 };
 
 /**
@@ -163,4 +177,15 @@ export function setExchangeRate(rate: number | null): number | null {
     _state.exchangeRate = rate;
     publish('exchange-rate-changed', rate);
     return _state.exchangeRate;
+}
+
+// Current backup state management
+export function getCurrentBackup(): BackupInfo | null {
+    return _state.currentBackup;
+}
+
+export function setCurrentBackup(backup: BackupInfo | null): BackupInfo | null {
+    _state.currentBackup = backup;
+    publish('current-backup-changed', backup);
+    return _state.currentBackup;
 }
