@@ -2,7 +2,6 @@ import * as lwk from "lwk_wasm"
 import {
     setWollet, getWollet,
     setCurrencyCode, getCurrencyCode,
-    setPricesFetcher, getPricesFetcher,
     setEsploraClient, getEsploraClient,
     setBoltzSession, getBoltzSession,
     setInvoiceResponse,
@@ -10,9 +9,10 @@ import {
     setWasmReady, isWasmReady,
     subscribe
 } from './state'
+import { fetchRates } from './src/api/pricer'
+import { fiatToSats as convertFiatToSats, satsToFiat as convertSatsToFiat } from './src/utils/rates'
 
 // Constants
-const SATOSHIS_PER_BTC: number = 100_000_000;
 const RATE_UPDATE_INTERVAL_MS: number = 60_000; // 1 minute
 const LOCALSTORAGE_FORM_KEY: string = 'btcpos_setup_form';
 
@@ -171,21 +171,21 @@ function renderTemplate(templateId: string): void {
 
 async function fetchExchangeRate(): Promise<void> {
     const currencyCode = getCurrencyCode();
-    const pricesFetcher = getPricesFetcher();
 
-    if (!currencyCode || !pricesFetcher) {
+    if (!currencyCode) {
         return;
     }
 
     try {
-        const rates = await pricesFetcher.rates(currencyCode);
-        const median = rates.median();
-        setExchangeRate(median);
+        const currencyString = currencyCode.toString();
+        const rates = await fetchRates(currencyString);
+        const mid = rates.mid;
+        setExchangeRate(mid);
 
         // Update UI
         const rateValue = document.getElementById('rate-value');
         if (rateValue) {
-            rateValue.textContent = median.toLocaleString('en-US', {
+            rateValue.textContent = mid.toLocaleString('en-US', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             });
@@ -223,8 +223,7 @@ function fiatToSatoshis(fiatAmount: number): number {
         return 0;
     }
 
-    const btcAmount = fiatAmount / rate;
-    return Math.round(btcAmount * SATOSHIS_PER_BTC);
+    return convertFiatToSats(fiatAmount, rate);
 }
 
 // =============================================================================
@@ -558,8 +557,7 @@ function initPosPage(config: POSConfig): void {
         if (!rate || rate <= 0) {
             return 0;
         }
-        const btcAmount = satoshis / SATOSHIS_PER_BTC;
-        return btcAmount * rate;
+        return convertSatsToFiat(satoshis, rate);
     }
 
     // Update display styling based on mode
@@ -885,12 +883,9 @@ function initPosPage(config: POSConfig): void {
             setBoltzSession(boltzSession);
             console.log('Boltz session created');
 
-            // Initialize currency and price fetcher
+            // Initialize currency code
             const currencyCode = new lwk.CurrencyCode(currencyAlpha3);
             setCurrencyCode(currencyCode);
-
-            const pricesFetcher = new lwk.PricesFetcher();
-            setPricesFetcher(pricesFetcher);
 
             // Start rate updates
             startRateUpdates();
