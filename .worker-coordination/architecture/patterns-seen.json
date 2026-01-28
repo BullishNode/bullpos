@@ -1,1 +1,111 @@
-{}
+{
+  "last_updated": "2026-01-28T02:53:00-06:00",
+  "patterns": {
+    "monorepo_npm_workspaces": {
+      "type": "positive",
+      "location": "package.json",
+      "description": "NPM workspaces monorepo allowing independent development of frontend and backend while sharing dependency management",
+      "benefits": [
+        "Unified development workflow",
+        "Shared node_modules for common dependencies",
+        "Separate versioning and deployment per workspace"
+      ],
+      "session_added": 3
+    },
+    "service_layer_architecture": {
+      "type": "positive",
+      "location": "backend/src/services/",
+      "description": "Clean separation between routes, services, and database layer. Routes handle HTTP, services contain business logic, direct DB queries in services.",
+      "benefits": [
+        "Clear separation of concerns",
+        "Easier unit testing of business logic",
+        "Consistent data access patterns"
+      ],
+      "session_added": 3
+    },
+    "encryption_first_design": {
+      "type": "positive",
+      "location": "frontend/src/crypto/, backend/src/db/schema.ts",
+      "description": "Zero-knowledge architecture where server stores encrypted data that only clients can decrypt. AES-256-GCM for links, PGP for backups.",
+      "benefits": [
+        "True end-to-end encryption",
+        "Server compromise doesn't leak plaintext",
+        "Merchant retains custody of data"
+      ],
+      "session_added": 3
+    },
+    "wasm_integration": {
+      "type": "positive",
+      "location": "frontend/bootstrap.ts, frontend/index.ts",
+      "description": "WebAssembly bootstrap pattern for lwk_wasm Liquid wallet library. Async import centralized in bootstrap.ts.",
+      "benefits": [
+        "Heavy crypto operations run at near-native speed",
+        "Liquid wallet operations (signing, key derivation) in browser",
+        "Rest of codebase uses synchronous imports"
+      ],
+      "session_added": 3
+    },
+    "publish_subscribe_state": {
+      "type": "positive",
+      "location": "frontend/state.ts",
+      "description": "Centralized state management with event-based pub/sub for reactive UI updates",
+      "benefits": [
+        "Type-safe state access",
+        "Decoupled component communication",
+        "WASM readiness tracking"
+      ],
+      "session_added": 4
+    },
+    "jwt_auth_middleware": {
+      "type": "positive",
+      "location": "backend/src/middleware/auth.middleware.ts",
+      "description": "JWT-based authentication with explicit HS256 algorithm pinning to prevent algorithm confusion attacks",
+      "benefits": [
+        "Stateless authentication",
+        "Security-hardened implementation",
+        "TypeScript request augmentation for type safety"
+      ],
+      "session_added": 4
+    },
+    "zod_input_validation": {
+      "type": "positive",
+      "location": "backend/src/validators/",
+      "description": "Runtime input validation using Zod schemas with comprehensive error reporting",
+      "benefits": [
+        "Type-safe validation at runtime",
+        "Clear error messages for clients",
+        "Prevents malformed data from reaching services"
+      ],
+      "session_added": 4
+    },
+    "url_fragment_key_storage": {
+      "type": "positive",
+      "location": "frontend/src/utils/url-parser.ts",
+      "description": "AES encryption key stored in URL fragment (after #) which is never sent to server",
+      "benefits": [
+        "Key never leaves client browser",
+        "Server genuinely cannot decrypt",
+        "Stateless link sharing"
+      ],
+      "session_added": 4
+    },
+    "comprehensive_test_coverage": {
+      "type": "positive",
+      "location": "frontend/__tests__/, backend/src/__tests__/",
+      "description": "Both workspaces have extensive test suites with unit tests, integration tests, and mocking infrastructure",
+      "benefits": [
+        "Boltz API mocking for offline testing",
+        "Service layer unit tests",
+        "Full API integration tests"
+      ],
+      "session_added": 4
+    },
+    "snake_case_sql_camelcase_ts": {
+      "type": "neutral",
+      "location": "backend/src/services/merchant.service.ts",
+      "description": "Explicit mapping between SQL snake_case columns and TypeScript camelCase properties",
+      "notes": "Common pattern, consider using a library like drizzle-orm for automatic mapping in future",
+      "session_added": 4
+    }
+  }
+}

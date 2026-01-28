@@ -1,12 +1,72 @@
 {
-  "session_count": 1,
+  "session_count": 4,
+  "last_updated": "2026-01-28T02:53:00-06:00",
   "areas": {
-    "lib/features/": {
-      "last_reviewed_session": 1,
-      "last_reviewed_commit": "f2d4d90",
-      "last_reviewed_at": "2026-01-27T22:47:35-06:00",
+    "frontend/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 2,
+      "findings": 2,
+      "notes": "Main application code, WASM integration, state management"
+    },
+    "frontend/src/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 2,
+      "findings": 1,
+      "notes": "Crypto modules (AES, PGP) and utility functions (rates, url-parser)"
+    },
+    "frontend/__tests__/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
       "review_count": 1,
-      "findings": 0
+      "findings": 0,
+      "notes": "Comprehensive test suite with unit and integration tests, Boltz mocking"
+    },
+    "backend/src/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 2,
+      "findings": 3,
+      "notes": "Express server, services, routes, middleware, validators"
+    },
+    "backend/src/__tests__/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 1,
+      "findings": 0,
+      "notes": "Unit and integration tests for all services and routes"
+    },
+    "src/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 1,
+      "findings": 1,
+      "notes": "Root-level src directory exists but contains no TypeScript files - appears to be placeholder or legacy"
+    },
+    "N/": {
+      "last_reviewed_session": 4,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:53:00-06:00",
+      "review_count": 1,
+      "findings": 1,
+      "notes": "Mysterious directory containing only CLAUDE.md - likely development artifact, recommend removal"
+    }
+  },
+  "removed_areas": {
+    "lib/features/": {
+      "reason": "Directory does not exist in current codebase",
+      "removed_in_session": 4,
+      "previous_tracking": {
+        "last_reviewed_session": 1,
+        "last_reviewed_commit": "f2d4d90"
+      }
     }
   }
 }
