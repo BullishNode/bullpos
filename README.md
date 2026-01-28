@@ -61,6 +61,10 @@ npm test
    - Server stores backup it cannot decrypt
    - Only merchant can recover failed swaps
 
+## Acknowledgment
+
+BullPOS frontend is a fork of btcpos: https://github.com/RCasatta/btcpos 
+
 ## License
 
 MIT
