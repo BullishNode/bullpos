@@ -1,0 +1,29 @@
+Issue: #46 - [bullbitcoin-mobile] Implement payment history list screen
+Status: BLOCKED - Repository routing error
+Session: 1 (continuation)
+Date: 2026-01-28 03:03 AM CST
+
+ROUTING ERROR DETECTED:
+- Issue requires: bullbitcoin-mobile repository (Flutter/Dart)
+- Worker assigned to: bullpos repository (TypeScript/Node.js)
+- Tech stack incompatibility: 100%
+
+REQUIRED FILES (don't exist in bullpos):
+- lib/features/merchant_payments/ui/payment_history_screen.dart
+- lib/features/merchant_payments/ui/widgets/payment_history_item.dart
+- lib/features/merchant_payments/presentation/payment_history_cubit.dart
+- lib/features/merchant_payments/presentation/payment_history_state.dart
+
+ACTION TAKEN:
+- Created .github/issues/ROUTING_ERROR_46.md documenting the error
+- Following established pattern from issues #35-42
+- Preparing PR to document routing error
+
+OUTCOME:
+- Cannot implement mobile Flutter screens in web TypeScript codebase
+- Requires manual intervention to route to correct repository
+- Part of systemic routing bug affecting batch-20260127-181138-2751594
+
+RECOMMENDATION:
+- Fix conductor.sh to parse [repository-name] from issue titles
+- Route issues #43-46 (and likely more) to bullbitcoin-mobile worktree
