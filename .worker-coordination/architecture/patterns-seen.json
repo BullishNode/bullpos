@@ -1,1 +1,67 @@
-{}
+{
+  "patterns": [
+    {
+      "name": "monorepo-workspaces",
+      "type": "positive",
+      "location": "root package.json",
+      "description": "npm workspaces enabling shared dependencies and coordinated build/test commands",
+      "session": 3
+    },
+    {
+      "name": "service-layer-pattern",
+      "type": "positive",
+      "location": "backend/src/services/",
+      "description": "Clean separation of routes → services → db for business logic",
+      "session": 3
+    },
+    {
+      "name": "zod-validation",
+      "type": "positive",
+      "location": "backend/src/validators/",
+      "description": "Type-safe input validation with Zod schemas",
+      "session": 3
+    },
+    {
+      "name": "pub-sub-state",
+      "type": "neutral",
+      "location": "frontend/state.ts",
+      "description": "Simple pub-sub state management with subscribe/publish - works but not reactive",
+      "session": 3
+    },
+    {
+      "name": "encryption-first-design",
+      "type": "positive",
+      "location": "frontend/src/crypto/, CLAUDE.md",
+      "description": "Server cannot decrypt content - only stores ciphertext (AES key in URL fragment)",
+      "session": 3
+    },
+    {
+      "name": "wasm-integration",
+      "type": "positive",
+      "location": "frontend/bootstrap.ts",
+      "description": "LWK WASM for native Bitcoin/Liquid operations in browser",
+      "session": 3
+    },
+    {
+      "name": "monolith-file",
+      "type": "anti-pattern",
+      "location": "frontend/index.ts",
+      "description": "1152 LOC single file with all UI logic, event handling, state management",
+      "session": 3
+    },
+    {
+      "name": "manual-dom-manipulation",
+      "type": "anti-pattern",
+      "location": "frontend/index.ts",
+      "description": "document.getElementById() throughout instead of reactive templating",
+      "session": 3
+    },
+    {
+      "name": "stub-implementations",
+      "type": "anti-pattern",
+      "location": "frontend/src/crypto/aes.ts, frontend/src/crypto/pgp.ts",
+      "description": "Placeholder stubs that throw errors - blocks core functionality",
+      "session": 3
+    }
+  ]
+}

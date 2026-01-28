@@ -1,12 +1,37 @@
 {
-  "session_count": 1,
+  "session_count": 3,
   "areas": {
-    "lib/features/": {
-      "last_reviewed_session": 1,
-      "last_reviewed_commit": "f2d4d90",
-      "last_reviewed_at": "2026-01-27T22:47:35-06:00",
+    "frontend/": {
+      "last_reviewed_session": 3,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:50:00-06:00",
       "review_count": 1,
-      "findings": 0
+      "findings": 7,
+      "notes": "1152 LOC monolith in index.ts, manual DOM manipulation, callback-based state management, crypto stubs not implemented"
+    },
+    "backend/": {
+      "last_reviewed_session": 3,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:50:00-06:00",
+      "review_count": 1,
+      "findings": 5,
+      "notes": "Only 3 of 10+ endpoints implemented, auth/links/backups missing, good security foundation"
+    },
+    "src/": {
+      "last_reviewed_session": 3,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:50:00-06:00",
+      "review_count": 1,
+      "findings": 1,
+      "notes": "Empty placeholder directory with only CLAUDE.md files - can be removed"
+    },
+    "N/": {
+      "last_reviewed_session": 3,
+      "last_reviewed_commit": "675601f",
+      "last_reviewed_at": "2026-01-28T02:50:00-06:00",
+      "review_count": 1,
+      "findings": 1,
+      "notes": "Empty placeholder directory - can be removed"
     }
   }
 }
