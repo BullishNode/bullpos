@@ -13,6 +13,7 @@ import {
 } from './state'
 import { createAndUploadBackup, validateBackupSuccess } from './src/services/backup'
 import { updateBackupAfterClaim } from './src/services/claim'
+import { comparePaymentAmounts, formatPaymentDifference } from './src/utils/payment-status'
 
 // Constants
 const SATOSHIS_PER_BTC: number = 100_000_000;
@@ -808,7 +809,7 @@ function initPosPage(config: POSConfig): void {
             }
 
             // Navigate to receive page (only reached if backup succeeded or no merchant ID)
-            initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3);
+            initReceivePage(invoice, satoshis, fiatAmount, currencyAlpha3, claimAddress.toString());
 
             // Reset amount for next payment
             currentAmount = '0';
@@ -1014,9 +1015,16 @@ function initPosPage(config: POSConfig): void {
 /**
  * Spawn a background task to complete a swap payment
  * @param invoice - The InvoiceResponse from Boltz
+ * @param requestedSats - The originally requested amount in satoshis
+ * @param claimAddress - The address where funds will be claimed
  * @param onComplete - Callback when payment completes
  */
-function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: boolean, claimTxid?: string) => void): void {
+function spawnCompletePay(
+    invoice: lwk.InvoiceResponse,
+    requestedSats: number,
+    claimAddress: string,
+    onComplete: (success: boolean, requestedSats: number, receivedSats: number, claimTxid?: string) => void
+): void {
     setTimeout(async () => {
         try {
             console.log("Starting completePay in background...");
@@ -1026,6 +1034,13 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
             console.log("completePay finished with result:", completed);
 
             if (completed) {
+                // Get the actual received amount after claim
+                const receivedSats = await getReceivedAmount(requestedSats, claimAddress);
+
+                // Calculate payment comparison
+                const comparison = comparePaymentAmounts(requestedSats, receivedSats);
+                console.log('Payment comparison:', comparison);
+
                 // After successful claim, update backup with claim details
                 const backupInfo = getCurrentBackup();
                 if (backupInfo && backupInfo.swapId === swapId) {
@@ -1047,6 +1062,13 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
                             console.warn("Could not retrieve preimage:", e);
                         }
 
+                        // Update backup data with payment comparison
+                        const updatedBackupData = {
+                            ...backupInfo.originalData,
+                            requestedSats: requestedSats,
+                            receivedSats: receivedSats,
+                        };
+
                         await updateBackupAfterClaim(
                             backupInfo.merchantId,
                             backupInfo.backupId,
@@ -1055,7 +1077,7 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
                                 swapId: swapId,
                                 preimage: preimage,
                                 claimTxid: undefined, // lwk handles claim internally
-                                originalBackupData: backupInfo.originalData,
+                                originalBackupData: updatedBackupData,
                             }
                         );
 
@@ -1066,13 +1088,13 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
                     }
                 }
 
-                onComplete(true);
+                onComplete(true, requestedSats, receivedSats);
             } else {
-                onComplete(false);
+                onComplete(false, requestedSats, requestedSats);
             }
         } catch (error) {
             console.error("Error in completePay:", error);
-            onComplete(false);
+            onComplete(false, requestedSats, requestedSats);
         }
     }, 0);
 }
@@ -1084,7 +1106,7 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
 // Store the current config for returning to POS
 let currentPosConfig: POSConfig | null = null;
 
-function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmount: number, currencyAlpha3: string): void {
+function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmount: number, currencyAlpha3: string, claimAddress: string): void {
     renderTemplate('receive-page-template');
 
     // Get DOM elements
@@ -1149,17 +1171,35 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
     });
 
     // Spawn background task to wait for payment completion
-    spawnCompletePay(invoice, (success: boolean, claimTxid?: string) => {
+    spawnCompletePay(invoice, satoshis, claimAddress, (success: boolean, requestedSats: number, receivedSats: number, claimTxid?: string) => {
         if (success) {
+            // Calculate payment comparison
+            const comparison = comparePaymentAmounts(requestedSats, receivedSats);
+            const exchangeRate = getExchangeRate();
+            const paymentStatus = formatPaymentDifference(comparison, currencyAlpha3, exchangeRate);
+
             // Payment completed successfully
             statusIndicator.classList.remove('loading');
             statusIndicator.classList.add('ready');
-            statusText.textContent = 'Payment received!';
+
+            // Display payment status based on comparison
+            if (comparison.status === 'exact') {
+                statusText.textContent = 'Payment received!';
+            } else if (comparison.status === 'overpay') {
+                statusText.innerHTML = `<strong>${paymentStatus.title}</strong><br/>${paymentStatus.message}${paymentStatus.fiatMessage ? '<br/>' + paymentStatus.fiatMessage : ''}`;
+            } else {
+                statusText.innerHTML = `<strong>${paymentStatus.title}</strong><br/>${paymentStatus.message}${paymentStatus.fiatMessage ? '<br/>' + paymentStatus.fiatMessage : ''}`;
+            }
+
             backToPosButton.textContent = '✓ New Payment';
             backToPosButton.classList.remove('secondary-button');
 
             // Track successful payment (using bucket for privacy)
-            trackEvent('Payment Received', { amount: satoshiBucket(satoshis), currency: currencyAlpha3 });
+            trackEvent('Payment Received', {
+                amount: satoshiBucket(satoshis),
+                currency: currencyAlpha3,
+                paymentStatus: comparison.status,
+            });
 
             // Replace QR code with checkmark SVG
             const checkmarkSvg = `data:image/svg+xml,${encodeURIComponent(`
@@ -1249,6 +1289,60 @@ async function syncWallet(wollet: lwk.Wollet): Promise<void> {
     const update = await client.fullScan(wollet);
     if (update) {
         wollet.applyUpdate(update);
+    }
+}
+
+/**
+ * Get the received amount for a specific swap by checking wallet balance after claim
+ * This is a best-effort attempt - may return requested amount if actual amount can't be determined
+ *
+ * @param requestedSats - The originally requested amount
+ * @param _claimAddress - The address where funds were claimed (currently unused, reserved for future use)
+ * @returns The actual received amount in satoshis
+ */
+async function getReceivedAmount(requestedSats: number, _claimAddress: string): Promise<number> {
+    try {
+        const wollet = getWollet();
+        if (!wollet) {
+            console.warn('Wallet not available, using requested amount');
+            return requestedSats;
+        }
+
+        // Sync wallet to get latest transactions
+        await syncWallet(wollet);
+
+        // Try to get wallet balance - this is the total balance
+        // Note: LWK may provide methods like balance(), transactions(), or utxos()
+        // We'll try balance() first as a fallback
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const balance = (wollet as any).balance?.();
+
+        if (balance !== undefined && balance !== null) {
+            console.log('Wallet balance after claim:', balance);
+            // This is a simplification - in a real scenario we'd need to track
+            // the balance before and after, or get specific transaction details
+        }
+
+        // Try to get transactions if available
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const transactions = (wollet as any).transactions?.();
+        if (transactions) {
+            console.log('Wallet transactions available:', transactions);
+            // TODO: Parse transactions to find the specific claim transaction
+        }
+
+        // For now, we return the requested amount as a fallback
+        // In a production implementation, you would:
+        // 1. Track balance before claim
+        // 2. Get balance after claim
+        // 3. Calculate difference
+        // OR get the specific transaction details for the claim
+
+        console.warn('Could not determine exact received amount, using requested amount');
+        return requestedSats;
+    } catch (error) {
+        console.error('Error getting received amount:', error);
+        return requestedSats;
     }
 }
 

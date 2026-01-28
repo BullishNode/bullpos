@@ -13,8 +13,14 @@ export interface SwapBackupData {
     /** Lightning invoice preimage (if available) */
     preimage?: string;
 
-    /** Amount in satoshis */
+    /** Amount in satoshis (requested) */
     amountSatoshis: number;
+
+    /** Requested amount in satoshis (same as amountSatoshis for backward compat) */
+    requestedSats?: number;
+
+    /** Actual received amount in satoshis after claim */
+    receivedSats?: number;
 
     /** Lightning invoice bolt11 string */
     bolt11Invoice: string;
