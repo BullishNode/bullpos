@@ -55,6 +55,15 @@ export function satoshiBucket(satoshis: number): string {
 }
 
 /**
+ * Line item with optional image attachment
+ */
+export interface LineItem {
+    description: string;
+    amount: number;
+    imageDataUrl?: string; // Optional base64 data URL (e.g., data:image/png;base64,...)
+}
+
+/**
  * Validate invoice payload structure
  * @param payload - Invoice data to validate
  * @returns true if valid, false otherwise
@@ -65,6 +74,11 @@ export interface InvoicePayload {
     satoshis: number;
     description: string | null;
     timestamp: string;
+    // Rich content attachments (Phase 4)
+    headerImageDataUrl?: string; // Optional header/logo image (base64 data URL)
+    lineItems?: LineItem[]; // Optional line items with images
+    pdfDataUrl?: string; // Optional PDF attachment (base64 data URL)
+    pdfFilename?: string; // Optional PDF filename for display
 }
 
 export function validateInvoicePayload(payload: unknown): payload is InvoicePayload {
@@ -100,6 +114,42 @@ export function validateInvoicePayload(payload: unknown): payload is InvoicePayl
     }
     const date = new Date(p.timestamp);
     if (isNaN(date.getTime())) {
+        return false;
+    }
+
+    // Validate optional headerImageDataUrl (must be string if present)
+    if (p.headerImageDataUrl !== undefined && typeof p.headerImageDataUrl !== 'string') {
+        return false;
+    }
+
+    // Validate optional lineItems array
+    if (p.lineItems !== undefined) {
+        if (!Array.isArray(p.lineItems)) {
+            return false;
+        }
+        // Validate each line item
+        for (const item of p.lineItems) {
+            if (!item || typeof item !== 'object') {
+                return false;
+            }
+            const lineItem = item as Record<string, unknown>;
+            if (typeof lineItem.description !== 'string' || typeof lineItem.amount !== 'number') {
+                return false;
+            }
+            // imageDataUrl is optional but must be string if present
+            if (lineItem.imageDataUrl !== undefined && typeof lineItem.imageDataUrl !== 'string') {
+                return false;
+            }
+        }
+    }
+
+    // Validate optional pdfDataUrl (must be string if present)
+    if (p.pdfDataUrl !== undefined && typeof p.pdfDataUrl !== 'string') {
+        return false;
+    }
+
+    // Validate optional pdfFilename (must be string if present)
+    if (p.pdfFilename !== undefined && typeof p.pdfFilename !== 'string') {
         return false;
     }
 

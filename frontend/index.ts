@@ -966,7 +966,14 @@ function spawnCompletePay(invoice: lwk.InvoiceResponse, onComplete: (success: bo
 // Store the current config for returning to POS
 let currentPosConfig: POSConfig | null = null;
 
-function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmount: number, currencyAlpha3: string): void {
+interface RichInvoiceData {
+    headerImageDataUrl?: string;
+    lineItems?: Array<{description: string; amount: number; imageDataUrl?: string}>;
+    pdfDataUrl?: string;
+    pdfFilename?: string;
+}
+
+function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmount: number, currencyAlpha3: string, richData?: RichInvoiceData): void {
     renderTemplate('receive-page-template');
 
     // Get DOM elements
@@ -1004,6 +1011,119 @@ function initReceivePage(invoice: lwk.InvoiceResponse, satoshis: number, fiatAmo
         const dwid = wollet.dwid();
         walletIdDisplay.textContent = dwid;
         setupMnemonicExportTrigger(walletIdDisplay, () => dwid);
+    }
+
+    // Display rich content attachments if present
+    if (richData) {
+        // Display header image
+        if (richData.headerImageDataUrl) {
+            const headerImageSection = document.getElementById('header-image-section') as HTMLDivElement;
+            const headerImage = document.getElementById('header-image') as HTMLImageElement;
+            try {
+                headerImage.src = richData.headerImageDataUrl;
+                headerImage.onerror = () => {
+                    console.warn('Failed to load header image');
+                    headerImageSection.style.display = 'none';
+                };
+                headerImageSection.style.display = 'block';
+            } catch (e) {
+                console.warn('Invalid header image data URL:', e);
+            }
+        }
+
+        // Display line items
+        if (richData.lineItems && richData.lineItems.length > 0) {
+            const lineItemsSection = document.getElementById('line-items-section') as HTMLDivElement;
+            const lineItemsList = document.getElementById('line-items-list') as HTMLDivElement;
+
+            lineItemsList.innerHTML = '';
+            richData.lineItems.forEach((item) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'line-item';
+
+                if (item.imageDataUrl) {
+                    const img = document.createElement('img');
+                    img.className = 'line-item-image';
+                    img.alt = item.description;
+                    try {
+                        img.src = item.imageDataUrl;
+                        img.onerror = () => {
+                            console.warn('Failed to load line item image for:', item.description);
+                            img.style.display = 'none';
+                        };
+                        itemDiv.appendChild(img);
+                    } catch (e) {
+                        console.warn('Invalid line item image data URL for:', item.description, e);
+                    }
+                }
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'line-item-text';
+
+                const descSpan = document.createElement('span');
+                descSpan.className = 'line-item-description';
+                descSpan.textContent = item.description;
+
+                const amountSpan = document.createElement('span');
+                amountSpan.className = 'line-item-amount';
+                amountSpan.textContent = `${currencyAlpha3} ${item.amount.toFixed(2)}`;
+
+                textDiv.appendChild(descSpan);
+                textDiv.appendChild(amountSpan);
+                itemDiv.appendChild(textDiv);
+                lineItemsList.appendChild(itemDiv);
+            });
+
+            lineItemsSection.style.display = 'block';
+        }
+
+        // Display PDF attachment
+        if (richData.pdfDataUrl) {
+            const pdfSection = document.getElementById('pdf-section') as HTMLDivElement;
+            const pdfFilenameSpan = document.getElementById('pdf-filename') as HTMLSpanElement;
+            const pdfDownload = document.getElementById('pdf-download') as HTMLAnchorElement;
+            const pdfViewButton = document.getElementById('pdf-view') as HTMLButtonElement;
+            const pdfViewerModal = document.getElementById('pdf-viewer-modal') as HTMLDivElement;
+            const pdfEmbed = document.getElementById('pdf-embed') as HTMLEmbedElement;
+            const closePdfModal = document.getElementById('close-pdf-modal') as HTMLButtonElement;
+            const modalPdfFilename = document.getElementById('modal-pdf-filename') as HTMLSpanElement;
+
+            const filename = richData.pdfFilename || 'document.pdf';
+            pdfFilenameSpan.textContent = filename;
+            modalPdfFilename.textContent = filename;
+
+            try {
+                pdfDownload.href = richData.pdfDataUrl;
+                pdfDownload.download = filename;
+
+                pdfViewButton.addEventListener('click', () => {
+                    try {
+                        pdfEmbed.src = richData.pdfDataUrl!;
+                        pdfViewerModal.style.display = 'flex';
+                    } catch (e) {
+                        console.error('Failed to display PDF:', e);
+                        alert('Unable to display PDF. Please try downloading it instead.');
+                    }
+                });
+
+                closePdfModal.addEventListener('click', () => {
+                    pdfViewerModal.style.display = 'none';
+                    pdfEmbed.src = '';
+                });
+
+                // Close modal when clicking outside
+                pdfViewerModal.addEventListener('click', (e) => {
+                    if (e.target === pdfViewerModal) {
+                        pdfViewerModal.style.display = 'none';
+                        pdfEmbed.src = '';
+                    }
+                });
+
+                pdfSection.style.display = 'block';
+            } catch (e) {
+                console.warn('Invalid PDF data URL:', e);
+            }
+        }
     }
 
     // Copy invoice button
