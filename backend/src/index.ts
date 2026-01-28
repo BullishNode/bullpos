@@ -58,6 +58,11 @@ app.use('/api', authRouter); // Includes /api/merchants/register and /api/auth/l
 app.use('/api/links', linksRouter);
 app.use('/api/backups', backupsRouter);
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
 // Global error handler (must be after all routes)
 app.use(errorLogger);
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
