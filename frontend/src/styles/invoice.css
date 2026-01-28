@@ -1,0 +1,248 @@
+/* Invoice Display Styles */
+
+.invoice-display {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Invoice Header (Merchant Branding) */
+.invoice-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.merchant-logo {
+    max-width: 200px;
+    max-height: 80px;
+    margin-bottom: 1rem;
+    object-fit: contain;
+}
+
+.merchant-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+/* Invoice Metadata */
+.invoice-metadata {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 4px;
+}
+
+.metadata-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.metadata-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.metadata-value {
+    font-size: 1rem;
+    color: #111827;
+}
+
+/* Line Items Table */
+.line-items-container {
+    margin-bottom: 2rem;
+}
+
+.line-items-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.line-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.line-items-table thead {
+    background: #f3f4f6;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.line-items-table th {
+    padding: 0.75rem;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.line-items-table th.col-quantity,
+.line-items-table th.col-price,
+.line-items-table th.col-total {
+    text-align: right;
+}
+
+.line-items-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.line-items-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.line-items-table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.line-item-description {
+    font-weight: 500;
+}
+
+.line-item-quantity,
+.line-item-price,
+.line-item-total {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Invoice Amount (Prominent Display) */
+.invoice-amount {
+    text-align: center;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
+}
+
+.amount-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.amount-fiat {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.amount-sats {
+    font-size: 1.25rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Invoice Memo */
+.invoice-memo {
+    padding: 1rem;
+    background: #f9fafb;
+    border-left: 4px solid #667eea;
+    border-radius: 4px;
+}
+
+.memo-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.memo-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 640px) {
+    .invoice-display {
+        padding: 1rem;
+        border-radius: 0;
+    }
+
+    .invoice-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .merchant-name {
+        font-size: 1.25rem;
+    }
+
+    .invoice-metadata {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .line-items-table {
+        font-size: 0.75rem;
+    }
+
+    .line-items-table th,
+    .line-items-table td {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .line-items-title {
+        font-size: 1rem;
+    }
+
+    /* Make table scrollable on very small screens */
+    .line-items-container {
+        overflow-x: auto;
+    }
+
+    .amount-fiat {
+        font-size: 2rem;
+    }
+
+    .amount-sats {
+        font-size: 1rem;
+    }
+
+    .invoice-amount {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .invoice-display {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+
+    .invoice-amount {
+        background: #f3f4f6 !important;
+        color: #111827 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
