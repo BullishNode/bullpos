@@ -46,6 +46,9 @@ export function authenticateMerchant(req: Request, res: Response, next: NextFunc
   }
 }
 
+// Alias for backward compatibility with feature branch
+export const authenticateToken = authenticateMerchant;
+
 export function generateToken(merchantId: string, email: string): string {
   return jwt.sign(
     { merchantId, email } as JWTPayload,

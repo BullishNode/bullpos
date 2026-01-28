@@ -17,10 +17,11 @@ import { requestLogger, securityEventLogger, errorLogger } from './middleware/lo
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const DB_PATH = process.env.DB_PATH || './bullpos.db';
 
 // Initialize database with error handling
 try {
-  initializeDatabase();
+  initializeDatabase(DB_PATH);
   console.log('Database initialized successfully');
 } catch (error) {
   console.error('Failed to initialize database:', error);
@@ -58,13 +59,15 @@ app.use('/api', authRouter); // Includes /api/merchants/register and /api/auth/l
 app.use('/api/links', linksRouter);
 app.use('/api/backups', backupsRouter);
 
+// Error logging (must be before error handler)
+app.use(errorLogger);
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
 
 // Global error handler (must be after all routes)
-app.use(errorLogger);
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });
@@ -72,6 +75,7 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 
 app.listen(PORT, () => {
   console.log(`BullPOS Backend running on port ${PORT}`);
+  console.log(`Database: ${DB_PATH}`);
 });
 
 export default app;
