@@ -55,6 +55,12 @@ export function getProfile(merchantId: string): MerchantProfile | null {
 }
 
 export function updateProfile(merchantId: string, updates: UpdateProfileInput): MerchantProfile | null {
+  // Verify merchant exists before attempting update
+  const existingProfile = getProfile(merchantId);
+  if (!existingProfile) {
+    return null;
+  }
+
   const fields: string[] = [];
   const values: unknown[] = [];
 
@@ -80,7 +86,7 @@ export function updateProfile(merchantId: string, updates: UpdateProfileInput): 
   }
 
   if (fields.length === 0) {
-    return getProfile(merchantId);
+    return existingProfile; // No updates requested, return current profile
   }
 
   fields.push('updated_at = ?');
@@ -93,7 +99,13 @@ export function updateProfile(merchantId: string, updates: UpdateProfileInput): 
     WHERE id = ?
   `);
 
-  stmt.run(...values);
+  const result = stmt.run(...values);
+
+  // Verify update was successful
+  if (result.changes === 0) {
+    return null;
+  }
+
   return getProfile(merchantId);
 }
 

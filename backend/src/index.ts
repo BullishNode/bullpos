@@ -13,8 +13,14 @@ import { merchantsRouter } from './routes/merchants.routes';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize database
-initializeDatabase();
+// Initialize database with error handling
+try {
+  initializeDatabase();
+  console.log('Database initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize database:', error);
+  process.exit(1);
+}
 
 // Security middleware
 app.use(helmet());
@@ -35,6 +41,12 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/merchants', merchantsRouter);
+
+// Global error handler (must be after all routes)
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 // TODO: Add remaining routes
 // - POST /api/auth/login
