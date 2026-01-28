@@ -61,6 +61,14 @@ npm test
    - Server stores backup it cannot decrypt
    - Only merchant can recover failed swaps
 
+## Authentication
+
+Merchants register using BIP85-derived credentials:
+- Username: wallet fingerprint
+- Password: BIP85-derived password (min 8 characters)
+
+JWT tokens are issued on successful login/registration with 7-day expiration.
+
 ## License
 
 MIT
