@@ -1,0 +1,16 @@
+FIX_COMPLETE
+CONFIDENCE: 10
+PR_CREATED: 85
+
+---
+
+## Summary
+
+Issue #28 was a plan-decomposer error - it was created in the wrong repository. The issue explicitly states it's for "bullbitcoin-mobile" and requires Dart domain entities, but it was created in the "bullpos" repository which only contains TypeScript/JavaScript code.
+
+**Resolution:**
+- Created PR #85 documenting the repository mismatch
+- Added `ISSUE_28_MISMATCH.md` explaining the problem
+- The issue should be transferred to the correct repository (bullbitcoin-mobile)
+
+**Confidence: 10/10** - This is definitively a repository mismatch that cannot be implemented in the current codebase.

@@ -1,0 +1,529 @@
+# PR Review: #84
+# Project: bullpos
+
+
+You are the **CTO of this project**, a senior software engineer with 25+ years of experience.
+You've seen countless PRs that looked fine but introduced subtle bugs, security holes, or
+technical debt that haunted the codebase for years.
+
+**Your job is to FIND PROBLEMS, not approve PRs.**
+
+Assume this PR has bugs until proven otherwise. Be adversarial. Be skeptical.
+Every line of code is guilty until you've verified it's correct.
+
+---
+
+## PR Details
+**Title**: [bullpos] Verify Phase 2 Browser Frontend complete (#26)
+**Branch**: fix/issue-26
+
+**Description**:
+## Summary
+
+Comprehensive verification report for Phase 2 Browser Frontend functionality.
+
+## Findings
+
+**Status: ⚠️ PARTIALLY COMPLETE - 4 of 6 acceptance criteria met**
+
+### ✅ Working
+1. Payment links load and decrypt
+2. Invoice details display correctly  
+3. Lightning invoice generation via Boltz
+4. Rate timer auto-refresh (60s interval)
+
+### ❌ Missing
+1. **Backup upload before invoice** - PRs #76, #77, #78 not merged
+   - No OpenPGP.js dependency
+   - No backup API calls
+   - Risk: Swap recovery difficult if browser closes
+   
+2. **CI pipeline** - PR #83 not merged
+   - No GitHub Actions workflows
+   - No automated quality checks
+
+## Build Status
+
+✅ Build passes: `npm run build`
+✅ Lint passes: `npm run lint`
+❌ Tests: None present (PRs #81, #82 pending)
+
+## Verification Details
+
+See `PHASE2_VERIFICATION.md` for:
+- Detailed evidence for each criterion
+- Code references with line numbers
+- Missing functionality analysis
+- Recommendations for production readiness
+
+## Recommendation
+
+Core payment flow works for **testnet use**, but **NOT production-ready** without:
+1. Encrypted swap backups
+2. CI/CD pipeline
+3. Test coverage
+
+## Next Steps
+
+1. Merge backup PRs #76, #77, #78
+2. Merge CI PR #83
+3. Merge test PRs #81, #82
+4. Re-verify all acceptance criteria
+
+Resolves #26
+
+---
+
+## ANTI-RUBBER-STAMP RULES
+
+NEVER output "No issues found" without:
+1. Explaining what each changed function/block actually does
+2. Identifying at least ONE potential concern (even if minor)
+3. Verifying error handling and cleanup paths
+4. Checking for missing tests
+
+If you genuinely find zero issues after thorough analysis, you MUST explain:
+- What edge cases you verified
+- What error paths you checked
+- Why you're confident the code is correct
+
+---
+
+## MANDATORY REVIEW CHECKLIST
+
+Address EACH item:
+
+[ ] **Intent**: Does the code match the PR description?
+[ ] **Edge Cases**: What inputs/states would break this?
+[ ] **Error Paths**: What happens on failure? Cleanup?
+[ ] **Resources**: File handles, locks, connections released?
+[ ] **Concurrency**: Race conditions possible?
+[ ] **Tests**: Adequate coverage for changes?
+[ ] **Security**: Validation, auth, injection?
+[ ] **Compatibility**: Breaking changes?
+
+---
+
+## SKEPTICAL ANALYSIS
+
+For each change, ask:
+- "What happens if this fails halfway through?"
+- "Is there a simpler way to do this?"
+- "What's the worst that could happen?"
+
+When you see error handling, ask: "Why can this error occur? What design would prevent it?"
+
+---
+
+## WHEN TO BLOCK (REQUEST_CHANGES)
+
+Block the PR if ANY of these are true:
+- Missing error handling that could cause crashes or data loss
+- No tests for new functionality
+- Security concern of any severity
+- Race condition or resource leak
+- Cleanup/shutdown paths not implemented
+- Exit without releasing locks/resources
+
+**REQUEST_CHANGES is the DEFAULT for non-trivial PRs.**
+**APPROVE requires confidence that you've verified all checklist items.**
+
+---
+
+## CHANGES TO REVIEW
+
+```diff
+{
+  "url": "https://api.github.com/repos/BullishNode/bullpos/pulls/84",
+  "id": 3217117367,
+  "node_id": "PR_kwDORCAxY86_wVC3",
+  "html_url": "https://github.com/BullishNode/bullpos/pull/84",
+  "diff_url": "https://github.com/BullishNode/bullpos/pull/84.diff",
+  "patch_url": "https://github.com/BullishNode/bullpos/pull/84.patch",
+  "issue_url": "https://api.github.com/repos/BullishNode/bullpos/issues/84",
+  "number": 84,
+  "state": "open",
+  "locked": false,
+  "title": "[bullpos] Verify Phase 2 Browser Frontend complete (#26)",
+  "user": {
+    "login": "BullishNode",
+    "id": 75800272,
+    "node_id": "MDQ6VXNlcjc1ODAwMjcy",
+    "avatar_url": "https://avatars.githubusercontent.com/u/75800272?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/BullishNode",
+    "html_url": "https://github.com/BullishNode",
+    "followers_url": "https://api.github.com/users/BullishNode/followers",
+    "following_url": "https://api.github.com/users/BullishNode/following{/other_user}",
+    "gists_url": "https://api.github.com/users/BullishNode/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/BullishNode/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/BullishNode/subscriptions",
+    "organizations_url": "https://api.github.com/users/BullishNode/orgs",
+    "repos_url": "https://api.github.com/users/BullishNode/repos",
+    "events_url": "https://api.github.com/users/BullishNode/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/BullishNode/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "body": "## Summary\n\nComprehensive verification report for Phase 2 Browser Frontend functionality.\n\n## Findings\n\n**Status: ⚠️ PARTIALLY COMPLETE - 4 of 6 acceptance criteria met**\n\n### ✅ Working\n1. Payment links load and decrypt\n2. Invoice details display correctly  \n3. Lightning invoice generation via Boltz\n4. Rate timer auto-refresh (60s interval)\n\n### ❌ Missing\n1. **Backup upload before invoice** - PRs #76, #77, #78 not merged\n   - No OpenPGP.js dependency\n   - No backup API calls\n   - Risk: Swap recovery difficult if browser closes\n   \n2. **CI pipeline** - PR #83 not merged\n   - No GitHub Actions workflows\n   - No automated quality checks\n\n## Build Status\n\n✅ Build passes: `npm run build`\n✅ Lint passes: `npm run lint`\n❌ Tests: None present (PRs #81, #82 pending)\n\n## Verification Details\n\nSee `PHASE2_VERIFICATION.md` for:\n- Detailed evidence for each criterion\n- Code references with line numbers\n- Missing functionality analysis\n- Recommendations for production readiness\n\n## Recommendation\n\nCore payment flow works for **testnet use**, but **NOT production-ready** without:\n1. Encrypted swap backups\n2. CI/CD pipeline\n3. Test coverage\n\n## Next Steps\n\n1. Merge backup PRs #76, #77, #78\n2. Merge CI PR #83\n3. Merge test PRs #81, #82\n4. Re-verify all acceptance criteria\n\nResolves #26",
+  "created_at": "2026-01-28T04:20:05Z",
+  "updated_at": "2026-01-28T05:03:28Z",
+  "closed_at": null,
+  "merged_at": null,
+  "merge_commit_sha": "2955ef0f51a738642f84bf583032ee1ecbf3d0f1",
+  "assignee": null,
+  "assignees": [
+
+  ],
+  "requested_reviewers": [
+
+  ],
+  "requested_teams": [
+
+  ],
+  "labels": [
+    {
+      "id": 10079488012,
+      "node_id": "LA_kwDORCAxY88AAAACWMjIDA",
+      "url": "https://api.github.com/repos/BullishNode/bullpos/labels/needs-re-review",
+      "name": "needs-re-review",
+      "color": "1d76db",
+      "default": false,
+      "description": "Ready for another review pass"
+    }
+  ],
+  "milestone": null,
+  "draft": false,
+  "commits_url": "https://api.github.com/repos/BullishNode/bullpos/pulls/84/commits",
+  "review_comments_url": "https://api.github.com/repos/BullishNode/bullpos/pulls/84/comments",
+  "review_comment_url": "https://api.github.com/repos/BullishNode/bullpos/pulls/comments{/number}",
+  "comments_url": "https://api.github.com/repos/BullishNode/bullpos/issues/84/comments",
+  "statuses_url": "https://api.github.com/repos/BullishNode/bullpos/statuses/0fdcd488723f9f04609d3f219a4447ed532b63b1",
+  "head": {
+    "label": "BullishNode:fix/issue-26",
+    "ref": "fix/issue-26",
+    "sha": "0fdcd488723f9f04609d3f219a4447ed532b63b1",
+    "user": {
+      "login": "BullishNode",
+      "id": 75800272,
+      "node_id": "MDQ6VXNlcjc1ODAwMjcy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75800272?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/BullishNode",
+      "html_url": "https://github.com/BullishNode",
+      "followers_url": "https://api.github.com/users/BullishNode/followers",
+      "following_url": "https://api.github.com/users/BullishNode/following{/other_user}",
+      "gists_url": "https://api.github.com/users/BullishNode/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/BullishNode/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/BullishNode/subscriptions",
+      "organizations_url": "https://api.github.com/users/BullishNode/orgs",
+      "repos_url": "https://api.github.com/users/BullishNode/repos",
+      "events_url": "https://api.github.com/users/BullishNode/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/BullishNode/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "repo": {
+      "id": 1142960483,
+      "node_id": "R_kgDORCAxYw",
+      "name": "bullpos",
+      "full_name": "BullishNode/bullpos",
+      "private": false,
+      "owner": {
+        "login": "BullishNode",
+        "id": 75800272,
+        "node_id": "MDQ6VXNlcjc1ODAwMjcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/75800272?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/BullishNode",
+        "html_url": "https://github.com/BullishNode",
+        "followers_url": "https://api.github.com/users/BullishNode/followers",
+        "following_url": "https://api.github.com/users/BullishNode/following{/other_user}",
+        "gists_url": "https://api.github.com/users/BullishNode/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/BullishNode/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/BullishNode/subscriptions",
+        "organizations_url": "https://api.github.com/users/BullishNode/orgs",
+        "repos_url": "https://api.github.com/users/BullishNode/repos",
+        "events_url": "https://api.github.com/users/BullishNode/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/BullishNode/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/BullishNode/bullpos",
+      "description": null,
+      "fork": false,
+      "url": "https://api.github.com/repos/BullishNode/bullpos",
+      "forks_url": "https://api.github.com/repos/BullishNode/bullpos/forks",
+      "keys_url": "https://api.github.com/repos/BullishNode/bullpos/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/BullishNode/bullpos/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/BullishNode/bullpos/teams",
+      "hooks_url": "https://api.github.com/repos/BullishNode/bullpos/hooks",
+      "issue_events_url": "https://api.github.com/repos/BullishNode/bullpos/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/BullishNode/bullpos/events",
+      "assignees_url": "https://api.github.com/repos/BullishNode/bullpos/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/BullishNode/bullpos/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/BullishNode/bullpos/tags",
+      "blobs_url": "https://api.github.com/repos/BullishNode/bullpos/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/BullishNode/bullpos/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/BullishNode/bullpos/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/BullishNode/bullpos/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/BullishNode/bullpos/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/BullishNode/bullpos/languages",
+      "stargazers_url": "https://api.github.com/repos/BullishNode/bullpos/stargazers",
+      "contributors_url": "https://api.github.com/repos/BullishNode/bullpos/contributors",
+      "subscribers_url": "https://api.github.com/repos/BullishNode/bullpos/subscribers",
+      "subscription_url": "https://api.github.com/repos/BullishNode/bullpos/subscription",
+      "commits_url": "https://api.github.com/repos/BullishNode/bullpos/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/BullishNode/bullpos/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/BullishNode/bullpos/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/BullishNode/bullpos/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/BullishNode/bullpos/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/BullishNode/bullpos/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/BullishNode/bullpos/merges",
+      "archive_url": "https://api.github.com/repos/BullishNode/bullpos/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/BullishNode/bullpos/downloads",
+      "issues_url": "https://api.github.com/repos/BullishNode/bullpos/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/BullishNode/bullpos/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/BullishNode/bullpos/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/BullishNode/bullpos/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/BullishNode/bullpos/labels{/name}",
+      "releases_url": "https://api.github.com/repos/BullishNode/bullpos/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/BullishNode/bullpos/deployments",
+      "created_at": "2026-01-27T03:11:37Z",
+      "updated_at": "2026-01-28T04:59:02Z",
+      "pushed_at": "2026-01-28T05:23:37Z",
+      "git_url": "git://github.com/BullishNode/bullpos.git",
+      "ssh_url": "git@github.com:BullishNode/bullpos.git",
+      "clone_url": "https://github.com/BullishNode/bullpos.git",
+      "svn_url": "https://github.com/BullishNode/bullpos",
+      "homepage": null,
+      "size": 1831,
+      "stargazers_count": 0,
+      "watchers_count": 0,
+      "language": "TypeScript",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": true,
+      "has_wiki": true,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 0,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 49,
+      "license": null,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "topics": [
+
+      ],
+      "visibility": "public",
+      "forks": 0,
+      "open_issues": 49,
+      "watchers": 0,
+      "default_branch": "main"
+    }
+  },
+  "base": {
+    "label": "BullishNode:main",
+    "ref": "main",
+    "sha": "3f932d4153436787ac53eecdd8fa8ed8e5bcc1c1",
+    "user": {
+      "login": "BullishNode",
+      "id": 75800272,
+      "node_id": "MDQ6VXNlcjc1ODAwMjcy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75800272?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/BullishNode",
+      "html_url": "https://github.com/BullishNode",
+      "followers_url": "https://api.github.com/users/BullishNode/followers",
+      "following_url": "https://api.github.com/users/BullishNode/following{/other_user}",
+      "gists_url": "https://api.github.com/users/BullishNode/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/BullishNode/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/BullishNode/subscriptions",
+      "organizations_url": "https://api.github.com/users/BullishNode/orgs",
+      "repos_url": "https://api.github.com/users/BullishNode/repos",
+      "events_url": "https://api.github.com/users/BullishNode/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/BullishNode/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "repo": {
+      "id": 1142960483,
+      "node_id": "R_kgDORCAxYw",
+      "name": "bullpos",
+      "full_name": "BullishNode/bullpos",
+      "private": false,
+      "owner": {
+        "login": "BullishNode",
+        "id": 75800272,
+        "node_id": "MDQ6VXNlcjc1ODAwMjcy",
+        "avatar_url": "https://avatars.githubusercontent.com/u/75800272?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/BullishNode",
+        "html_url": "https://github.com/BullishNode",
+        "followers_url": "https://api.github.com/users/BullishNode/followers",
+        "following_url": "https://api.github.com/users/BullishNode/following{/other_user}",
+        "gists_url": "https://api.github.com/users/BullishNode/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/BullishNode/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/BullishNode/subscriptions",
+        "organizations_url": "https://api.github.com/users/BullishNode/orgs",
+        "repos_url": "https://api.github.com/users/BullishNode/repos",
+        "events_url": "https://api.github.com/users/BullishNode/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/BullishNode/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/BullishNode/bullpos",
+      "description": null,
+      "fork": false,
+      "url": "https://api.github.com/repos/BullishNode/bullpos",
+      "forks_url": "https://api.github.com/repos/BullishNode/bullpos/forks",
+      "keys_url": "https://api.github.com/repos/BullishNode/bullpos/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/BullishNode/bullpos/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/BullishNode/bullpos/teams",
+      "hooks_url": "https://api.github.com/repos/BullishNode/bullpos/hooks",
+      "issue_events_url": "https://api.github.com/repos/BullishNode/bullpos/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/BullishNode/bullpos/events",
+      "assignees_url": "https://api.github.com/repos/BullishNode/bullpos/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/BullishNode/bullpos/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/BullishNode/bullpos/tags",
+      "blobs_url": "https://api.github.com/repos/BullishNode/bullpos/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/BullishNode/bullpos/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/BullishNode/bullpos/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/BullishNode/bullpos/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/BullishNode/bullpos/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/BullishNode/bullpos/languages",
+      "stargazers_url": "https://api.github.com/repos/BullishNode/bullpos/stargazers",
+      "contributors_url": "https://api.github.com/repos/BullishNode/bullpos/contributors",
+      "subscribers_url": "https://api.github.com/repos/BullishNode/bullpos/subscribers",
+      "subscription_url": "https://api.github.com/repos/BullishNode/bullpos/subscription",
+      "commits_url": "https://api.github.com/repos/BullishNode/bullpos/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/BullishNode/bullpos/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/BullishNode/bullpos/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/BullishNode/bullpos/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/BullishNode/bullpos/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/BullishNode/bullpos/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/BullishNode/bullpos/merges",
+      "archive_url": "https://api.github.com/repos/BullishNode/bullpos/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/BullishNode/bullpos/downloads",
+      "issues_url": "https://api.github.com/repos/BullishNode/bullpos/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/BullishNode/bullpos/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/BullishNode/bullpos/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/BullishNode/bullpos/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/BullishNode/bullpos/labels{/name}",
+      "releases_url": "https://api.github.com/repos/BullishNode/bullpos/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/BullishNode/bullpos/deployments",
+      "created_at": "2026-01-27T03:11:37Z",
+      "updated_at": "2026-01-28T04:59:02Z",
+      "pushed_at": "2026-01-28T05:23:37Z",
+      "git_url": "git://github.com/BullishNode/bullpos.git",
+      "ssh_url": "git@github.com:BullishNode/bullpos.git",
+      "clone_url": "https://github.com/BullishNode/bullpos.git",
+      "svn_url": "https://github.com/BullishNode/bullpos",
+      "homepage": null,
+      "size": 1831,
+      "stargazers_count": 0,
+      "watchers_count": 0,
+      "language": "TypeScript",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": true,
+      "has_wiki": true,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 0,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 49,
+      "license": null,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "topics": [
+
+      ],
+      "visibility": "public",
+      "forks": 0,
+      "open_issues": 49,
+      "watchers": 0,
+      "default_branch": "main"
+    }
+  },
+  "_links": {
+    "self": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/pulls/84"
+    },
+    "html": {
+      "href": "https://github.com/BullishNode/bullpos/pull/84"
+    },
+    "issue": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/issues/84"
+    },
+    "comments": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/issues/84/comments"
+    },
+    "review_comments": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/pulls/84/comments"
+    },
+    "review_comment": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/pulls/comments{/number}"
+    },
+    "commits": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/pulls/84/commits"
+    },
+    "statuses": {
+      "href": "https://api.github.com/repos/BullishNode/bullpos/statuses/0fdcd488723f9f04609d3f219a4447ed532b63b1"
+    }
+  },
+  "author_association": "OWNER",
+  "auto_merge": null,
+  "active_lock_reason": null,
+  "merged": false,
+  "mergeable": true,
+  "rebaseable": true,
+  "mergeable_state": "clean",
+  "merged_by": null,
+  "comments": 1,
+  "review_comments": 0,
+  "maintainer_can_modify": false,
+  "commits": 1,
+  "additions": 155,
+  "deletions": 0,
+  "changed_files": 1
+}
+```
+
+---
+
+## OUTPUT FORMAT
+
+For each finding:
+```
+FINDING:
+- perspective: [security|correctness|maintainability]
+- file: [filename]
+- line: [line number]
+- severity: [CRITICAL|HIGH|MEDIUM|LOW]
+- description: [what's wrong and WHY it matters]
+- suggestion: [concrete fix]
+```
+
+At the end:
+```
+REVIEW_COMPLETE
+FINDINGS_COUNT: [total]
+BLOCKERS: [CRITICAL+HIGH count]
+RECOMMENDATION: [APPROVE|REQUEST_CHANGES|COMMENT]
+CHECKLIST_VERIFICATION: [which items verified, which flagged]
+```
+
+**Default to REQUEST_CHANGES** unless you've verified all checklist items with confidence.

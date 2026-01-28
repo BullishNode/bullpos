@@ -1,0 +1,9 @@
+Let me store a memory about the workflow scope issue for future reference.
+
+```
+MEMORY_STORE: type=github_workflow_scope_limitation summary="GitHub OAuth tokens used by automated workers lack workflow scope, preventing direct push of .github/workflows/*.yml files. Workaround: create PR with workflow file in description for manual addition, or split commits to push other files first." issue=#25 result=success
+```
+
+FIX_COMPLETE
+CONFIDENCE: 9
+PR_CREATED: 83

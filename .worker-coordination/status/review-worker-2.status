@@ -1,0 +1,6 @@
+worker=review-worker
+instance=2
+status=stopped
+current_item=PR #63
+updated_at=2026-01-27T22:43:18-06:00
+pid=3255058

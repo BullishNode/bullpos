@@ -1,0 +1,30 @@
+⚠️  [BashTool] Pre-flight check is taking longer than expected. Run with ANTHROPIC_LOG=debug to check for failed or slow API requests.
+FIX_COMPLETE
+CONFIDENCE: 10
+PR_CREATED: 82
+
+## Summary
+
+Successfully implemented comprehensive integration tests for the payment flow with mocked Boltz API:
+
+### Files Created
+1. **`__tests__/mocks/boltz.ts`** - Mock Boltz client with configurable behavior
+2. **`__tests__/integration/payment-flow.test.ts`** - 10 tests covering happy path, backups, and timing
+3. **`__tests__/integration/rate-refresh.test.ts`** - 21 tests for rate fetching and updates
+4. **`__tests__/integration/error-scenarios.test.ts`** - 25 tests for error handling
+
+### Test Results
+- ✅ All 56 integration tests passing
+- ✅ Full test suite: 146 tests passed (39 skipped unit tests from #23)
+- ✅ Lint check passed (1 pre-existing warning)
+- ✅ Build successful
+
+### Key Features
+- Mock simulates complete Boltz swap lifecycle (created → mempool → confirmed → settled)
+- Configurable delays and failure modes for testing
+- Manual payment/expiry triggers for deterministic testing
+- Comprehensive error scenario coverage
+- Rate refresh and expiry handling
+
+### Pull Request
+Created PR #82 targeting main branch with detailed description of changes and test coverage.

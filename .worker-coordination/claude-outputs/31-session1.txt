@@ -1,0 +1,17 @@
+Perfect! PR created. Now let me output the completion signal:
+
+```
+FIX_COMPLETE
+CONFIDENCE: 2
+PR_CREATED: 88
+```
+
+**Explanation**: 
+
+Low confidence (2/10) because this is **not a fix** - it's a documentation PR explaining why the issue cannot be implemented in this repository. Issue #31 requires Dart/Flutter code in the bullbitcoin-mobile repository, but the vibelord routing system incorrectly routed it to the bullpos TypeScript repository.
+
+**Issue Root Cause**: Repository routing logic doesn't parse the `[bullbitcoin-mobile]` tag or `Repository: bullbitcoin-mobile` context field from the issue.
+
+**Required Action**: Re-route issue #31 to `/tmp/vibelord-worktrees/bullbitcoin-mobile/overnight/issue-31` where the Flutter/Dart implementation can be completed.
+
+MEMORY_STORE: type=routing_error summary="Issue #31 routed to wrong repository - needs bullbitcoin-mobile not bullpos" issue=#31 result=failure

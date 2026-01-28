@@ -1,0 +1,6 @@
+worker=overnight
+instance=1
+status=fixing
+current_item=40
+updated_at=2026-01-27T23:25:31-06:00
+pid=3643329
