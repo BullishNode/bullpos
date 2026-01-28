@@ -1,0 +1,79 @@
+# Issue #42 - Session 3 Output
+# Timestamp: 2026-01-28 02:51 AM CST
+
+## Session Summary
+
+**Status**: BLOCKED - Repository Routing Error
+**Action Taken**: Created routing error documentation PR
+**Outcome**: Documented systemic routing bug affecting issue #42
+
+## Issue Analysis
+
+Issue: #42 - [bullbitcoin-mobile] Add PDF attachment support to invoice builder
+- Required Repository: bullbitcoin-mobile (Flutter/Dart mobile app)
+- Current Repository: bullpos (TypeScript/Node.js web app)
+- Compatibility: 0% (completely different platforms)
+
+## Problem Details
+
+The issue requests:
+1. Add "Attach PDF" button to Flutter mobile UI
+2. Use native mobile file picker for PDF selection
+3. Update Dart models: InvoicePayload
+4. Modify Flutter widgets: pdf_attachment.dart, invoice_builder_screen.dart
+
+Available codebase provides:
+1. TypeScript/Node.js web application (bullpos)
+2. Browser-based POS system with React-like components
+3. No Flutter code, no Dart files, no mobile UI infrastructure
+
+Result: Cannot implement Flutter mobile features in TypeScript web codebase
+
+## Root Cause
+
+Vibelord conductor routing logic uses worktree filesystem paths to determine repository:
+- Reads: /tmp/vibelord-worktrees/bullpos/overnight/issue-42
+- Extracts: "bullpos" (from path)
+- Should read: "[bullbitcoin-mobile]" (from issue title prefix)
+
+## Historical Context
+
+Recurring pattern documented in:
+- Memory #37451: Repository Routing Bug Identified
+- Memory #37453: Session Blocked by Repository Mismatch
+- Memory #37454: Conductor Routing Logic Fix Proposal
+
+Previous affected issues:
+- Issue #35 → PR #91 (routing error doc)
+- Issue #36 → PR #92 (routing error doc)
+- Issue #37 → PR #93 (routing error doc)
+- Issue #38 → PR #94 (routing error doc)
+- Issue #41 → PR #97 (routing error doc)
+
+## Actions Taken
+
+1. Verified repository identity: bullpos (confirmed via package.json)
+2. Analyzed issue requirements: Flutter/Dart mobile code (incompatible)
+3. Searched for precedent: Found PRs #91-#97 documenting routing errors
+4. Created routing error documentation: .github/issues/ROUTING_ERROR_42.md
+5. Captured session output: .worker-coordination/claude-outputs/42-session3.txt
+6. Creating PR to satisfy completion signal requirement
+
+## Recommendations
+
+**Immediate**:
+1. Close this PR (documentation only, no functional changes)
+2. Create correct worktree in bullbitcoin-mobile repository
+3. Re-assign issue #42 to correct repository context
+
+**Long-term**:
+1. Fix conductor.sh routing logic to parse [repo-name] from issue titles
+2. Audit all active issues for potential misrouting
+3. Add validation to detect tech stack mismatches early
+
+## Completion Signal
+
+Creating PR with routing error documentation to satisfy vibelord completion requirements.
+
+---
+Session End: 2026-01-28 ~02:52 AM CST
