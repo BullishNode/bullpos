@@ -4,7 +4,6 @@
     "description": "Browser payment page for BullPOS (fork of btcpos)",
     "type": "module",
     "scripts": {
-        "dev": "webpack-dev-server",
         "start": "webpack-dev-server",
         "build": "rm -rf ./dist && webpack --config webpack.config.cjs --mode=production",
         "lint": "eslint *.ts **/*.ts",
